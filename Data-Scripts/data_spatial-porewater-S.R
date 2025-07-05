@@ -12,7 +12,7 @@ setwd("C:/Users/rajohnson6/Box/Projects/Seagrass Disturbance")
 library(tidyverse)
 
 # need to run "data_S-std-curves" script first
-
+source("C:/Users/rajohnson6/Desktop/Local-Repos/Disturbance-Edge-Effects/Data-Scripts/data_S-std-curves.R")
 
 
 # naming convention (examples for object names, so I don't forget by the time I have new data/runs to add here)
@@ -23,6 +23,21 @@ library(tidyverse)
 # S2_s01 -> site 2, surface porewater, run 1
 # S3_r02 -> site 3, rhizome porewater, run 2
 
+
+# Function to check standard concentrations for each run
+std_conc_chk = function(.dat, .std_curve) {
+   
+   .dat %>%
+      filter(str_detect(vial, pattern = "L")) %>%
+      # correct for blank absorbance
+      mutate(abs = abs_667 - (.dat %>% filter(sample_id=="Blank") %>% pull(abs_667) %>% mean)) %>%
+      # concentration
+      mutate(stdS = calc_h2s_conc(abs, .std_curve),
+             expected = parse_number(sample_id),
+             diff = expected - stdS,
+             percdiff = (diff / expected) * 100) %>%
+      print(n=Inf)
+}
 
 
 #--
@@ -37,16 +52,7 @@ raw_S1_s01 = read_csv("Data/Spec Data/2025.04.06 - FLK24_spatial surface porewat
    janitor::remove_empty(which = 'rows')
 
 # check measured concentration of standards
-raw_S1_s01 %>% 
-   filter(str_detect(vial, pattern = "L")) %>%
-   # correct for blank absorbance
-   mutate(abs = abs_667 - (raw_S1_s01 %>% filter(sample_id=="Blank") %>% pull(abs_667) %>% mean)) %>%
-   # concentration
-   mutate(stdS = calc_h2s_conc(abs, std_apr25),
-          expected = parse_number(sample_id),
-          diff = expected - stdS,
-          percdiff = (diff / expected) * 100) %>%
-   print(n=Inf)
+std_conc_chk(raw_S1_s01, std_apr25)
 
 
 # Pre-process data sheets, remove unnecessary data/rows
@@ -84,16 +90,7 @@ raw_S1_s02 = read_csv("Data/Spec Data/2025.04.13 - FLK24_spatial surface porewat
    janitor::remove_empty(which = 'rows')
 
 # check measured concentration of standards
-raw_S1_s02 %>% 
-   filter(str_detect(vial, pattern = "L")) %>%
-   # correct for blank absorbance
-   mutate(abs = abs_667 - (raw_S1_s02 %>% filter(sample_id=="Blank") %>% pull(abs_667) %>% mean)) %>%
-   # concentration
-   mutate(stdS = calc_h2s_conc(abs, std_apr25),
-          expected = parse_number(sample_id),
-          diff = expected - stdS,
-          percdiff = (diff / expected) * 100) %>%
-   print(n=Inf)
+std_conc_chk(raw_S1_s02, std_apr25)
 
 
 # Pre-process data sheets, remove unnecessary data/rows
@@ -134,16 +131,7 @@ raw_S2_s01 = read_csv("Data/Spec Data/2025.04.13 - FLK24_spatial surface porewat
    janitor::remove_empty(which = 'rows')
 
 # check measured concentration of standards
-raw_S2_s01 %>% 
-   filter(str_detect(vial, pattern = "L")) %>%
-   # correct for blank absorbance
-   mutate(abs = abs_667 - (raw_S2_s01 %>% filter(sample_id=="Blank") %>% pull(abs_667) %>% mean)) %>%
-   # concentration
-   mutate(stdS = calc_h2s_conc(abs, std_apr25),
-          expected = parse_number(sample_id),
-          diff = expected - stdS,
-          percdiff = (diff / expected) * 100) %>%
-   print(n=Inf)
+std_conc_chk(raw_S2_s01, std_apr25)
 
 
 # Pre-process data sheets, remove unnecessary data/rows
