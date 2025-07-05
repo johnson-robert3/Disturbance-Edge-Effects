@@ -83,7 +83,7 @@ S1_s01 = S1_s01 %>%
       # for post-color dilution
       abs_corr = abs_blk_corr * dilution_post) %>%
    # remove the samples that were too low and need to be re-run with a lower pre-color dilution
-   anti_join(S1_s01 %>% filter(str_detect(notes, pattern="rerun at lower df"))) %>%
+   anti_join(S1_s01 %>% filter(str_detect(flag, pattern="L"))) %>%
    # remove sample dupes
    filter(!(str_detect(sample_id, pattern="dup"))) %>%
    # sulfide concentration in microcentrifuge vial that diamine reagent was added to (units = uM)
@@ -117,7 +117,7 @@ S1_s02 = S1_s02 %>%
    # sulfide concentration in microcentrifuge vial that diamine reagent was added to (units = uM)
    mutate(vial_S_uM = calc_h2s_conc(abs_corr, std_apr25)) %>%
    # for samples that were below detection limit, concentration = 0
-   mutate(vial_S_uM = replace(vial_S_uM, str_detect(.$notes, pattern="DL"), 0))
+   mutate(vial_S_uM = replace(vial_S_uM, str_detect(.$flag, pattern="D"), 0))
 
 
 
@@ -154,9 +154,9 @@ S2_s01 = S2_s01 %>%
       # for post-color dilution
       abs_corr = abs_blk_corr * dilution_post) %>%
    # remove the samples that were too low and need to be re-run with a lower pre-color dilution
-   anti_join(S2_s01 %>% filter(str_detect(notes, pattern="rerun at lower df"))) %>%
+   anti_join(S2_s01 %>% filter(str_detect(flag, pattern="L"))) %>%
    # remove the samples that were too high and need to be re-run with a higher pre-color dilution
-   anti_join(S2_s01 %>% filter(str_detect(notes, pattern="rerun at higher df"))) %>%
+   anti_join(S2_s01 %>% filter(str_detect(flag, pattern="H"))) %>%
    # remove sample dupes
    filter(!(str_detect(sample_id, pattern="dup"))) %>%
    # remove the sample that was rerun with post-dilution (effect of post-dilution is non-linear, this sample needs to be rerun)
@@ -164,7 +164,7 @@ S2_s01 = S2_s01 %>%
    # sulfide concentration in microcentrifuge vial that diamine reagent was added to (units = uM)
    mutate(vial_S_uM = calc_h2s_conc(abs_corr, std_apr25)) %>%
    # for samples that were below detection limit, concentration = 0
-   mutate(vial_S_uM = replace(vial_S_uM, str_detect(.$notes, pattern="DL"), 0))
+   mutate(vial_S_uM = replace(vial_S_uM, str_detect(.$flag, pattern="D"), 0))
 
 
 
