@@ -39,6 +39,16 @@ std_conc_chk = function(.dat, .std_curve) {
       print(n=Inf)
 }
 
+# Function to remove Zeros, Blanks, Standards, and Checks vials from data
+rm_zbsc = function(.dat) {
+   
+   .dat %>%
+      filter(!(sample_id=="Zero" | sample_id=="Blank"),
+             !(str_detect(sample_id, pattern="chk")),
+             !(str_detect(sample_id, pattern="L")))
+}
+
+
 
 #--
 # Craig Key sites - spec data
@@ -56,11 +66,7 @@ std_conc_chk(raw_S1_s01, std_apr25)
 
 
 # Pre-process data sheets, remove unnecessary data/rows
-S1_s01 = raw_S1_s01 %>%
-   # remove Zero, blanks, standards, and checks
-   filter(!(sample_id=="Zero" | sample_id=="Blank"),
-          !(str_detect(sample_id, pattern="chk")),
-          !(str_detect(sample_id, pattern="L")))
+S1_s01 = rm_zbsc(raw_S1_s01)
 
 # check agreement between sample dupes
 S1_s01 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup")))
@@ -94,11 +100,7 @@ std_conc_chk(raw_S1_s02, std_apr25)
 
 
 # Pre-process data sheets, remove unnecessary data/rows
-S1_s02 = raw_S1_s02 %>%
-   # remove Zero, blanks, standards, and checks
-   filter(!(sample_id=="Zero" | sample_id=="Blank"),
-          !(str_detect(sample_id, pattern="chk")),
-          !(str_detect(sample_id, pattern="L")))
+S1_s02 = rm_zbsc(raw_S1_s02)
 
 # check agreement between sample dupes
 S1_s02 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup")))
@@ -135,11 +137,7 @@ std_conc_chk(raw_S2_s01, std_apr25)
 
 
 # Pre-process data sheets, remove unnecessary data/rows
-S2_s01 = raw_S2_s01 %>%
-   # remove Zero, blanks, standards, and checks
-   filter(!(sample_id=="Zero" | sample_id=="Blank"),
-          !(str_detect(sample_id, pattern="chk")),
-          !(str_detect(sample_id, pattern="L")))
+S2_s01 = rm_zbsc(raw_S2_s01)
 
 # check agreement between sample dupes
 S2_s01 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup")))
