@@ -7,9 +7,22 @@
 #~~~
 
 
+setwd("C:/Users/rajohnson6/Box/Projects/Seagrass Disturbance")
+
 library(tidyverse)
 
 # need to run "data_S-std-curves" script first
+
+
+
+# naming convention (examples for object names, so I don't forget by the time I have new data/runs to add here)
+# S1_s01 -> site 1, surface porewater, run 1
+# S1_r01 -> site 1, rhizome porewater, run 1
+# S1_r02 -> site 1, rhizome porewater, run 2
+
+# S2_s01 -> site 2, surface porewater, run 1
+# S3_r02 -> site 3, rhizome porewater, run 2
+
 
 
 #--
@@ -106,6 +119,7 @@ S1_s02 = S1_s02 %>%
    mutate(vial_S_uM = calc_h2s_conc(abs_corr, std_apr25)) %>%
    # for samples that were below detection limit, concentration = 0
    mutate(vial_S_uM = replace(vial_S_uM, str_detect(.$notes, pattern="DL"), 0))
+
 
 
 #--
