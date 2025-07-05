@@ -5,15 +5,15 @@
 
 library(tidyverse)
 
-setwd("C:/Users/rajohnson6/Box/Projects/Seagrass Disturbance/Data")
+setwd("C:/Users/rajohnson6/Box/Projects/Seagrass Disturbance")
 
 
 # data
-raw_spatial_dbd = read_csv("FLK24_spatial_sediment_bulk_density.csv")
-raw_meadow_parameters = read_csv("FLK24_meadow_parameters.csv")
-raw_morphometry = read_csv("FLK24_thalassia_morphometry.csv")
-raw_bps = read_csv("FLK24_thalassia_blades_per_shoot.csv")
-raw_ag_biomass = read_csv("FLK24_aboveground_biomass.csv")
+raw_spatial_dbd = read_csv("Data/FLK24_spatial_sediment_bulk_density.csv")
+raw_meadow_parameters = read_csv("Data/FLK24_meadow_parameters.csv")
+raw_morphometry = read_csv("Data/FLK24_thalassia_morphometry.csv")
+raw_bps = read_csv("Data/FLK24_thalassia_blades_per_shoot.csv")
+raw_ag_biomass = read_csv("Data/FLK24_aboveground_biomass.csv")
 
 
 # seagrass
