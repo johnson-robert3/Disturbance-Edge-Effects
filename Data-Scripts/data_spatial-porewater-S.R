@@ -25,7 +25,7 @@ source("C:/Users/rajohnson6/Desktop/Local-Repos/Disturbance-Edge-Effects/Data-Sc
 
 
 # Function to check standard concentrations for each run
-std_conc_chk = function(.dat, .std_curve) {
+check_stds = function(.dat, .std_curve) {
    
    .dat %>%
       filter(str_detect(vial, pattern = "L")) %>%
@@ -35,7 +35,7 @@ std_conc_chk = function(.dat, .std_curve) {
       mutate(stdS = calc_h2s_conc(abs, .std_curve),
              expected = parse_number(sample_id),
              diff = expected - stdS,
-             percdiff = (diff / expected) * 100) %>%
+             perc_diff = (diff / expected) * 100) %>%
       print(n=Inf)
 }
 
@@ -62,7 +62,7 @@ raw_S1_s01 = read_csv("Data/Spec Data/2025.04.06 - FLK24_spatial surface porewat
    janitor::remove_empty(which = 'rows')
 
 # check measured concentration of standards
-std_conc_chk(raw_S1_s01, std_apr25)
+check_stds(raw_S1_s01, std_apr25)
 
 
 # Pre-process data sheets, remove unnecessary data/rows
@@ -96,7 +96,7 @@ raw_S1_s02 = read_csv("Data/Spec Data/2025.04.13 - FLK24_spatial surface porewat
    janitor::remove_empty(which = 'rows')
 
 # check measured concentration of standards
-std_conc_chk(raw_S1_s02, std_apr25)
+check_stds(raw_S1_s02, std_apr25)
 
 
 # Pre-process data sheets, remove unnecessary data/rows
@@ -133,7 +133,7 @@ raw_S2_s01 = read_csv("Data/Spec Data/2025.04.13 - FLK24_spatial surface porewat
    janitor::remove_empty(which = 'rows')
 
 # check measured concentration of standards
-std_conc_chk(raw_S2_s01, std_apr25)
+check_stds(raw_S2_s01, std_apr25)
 
 
 # Pre-process data sheets, remove unnecessary data/rows
@@ -169,6 +169,49 @@ S2_s01 = S2_s01 %>%
 
 
 #--
+# Anne's Beach sites - spec data
+#--
+
+# Sites S3.1, S3.2
+
+#- Surface and Rhizome Porewater, run 1
+# Standard curve to use: April 2025
+raw_S3_s01 = read_csv("Data/Spec Data/2025.07.05 - FLK24_spatial surface rhizome porewater_S3.1-3.2.csv") %>%
+   janitor::remove_empty(which = 'rows')
+
+# check measured concentration of standards
+check_stds(raw_S3_s01, std_apr25)
+
+
+# Pre-process data sheets, remove unnecessary data/rows
+S3_s01 = rm_zbsc(raw_S3_s01)
+
+# check agreement between sample dupes
+S3_s01 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup")))
+   # all look good
+
+# Sulfide concentration in vials (units = uM)
+S3_s01 = S3_s01 %>%
+   # correct absorbance
+   mutate(
+      # for blanks
+      abs_blk_corr = abs_667 - (raw_S3_s01 %>% filter(sample_id=="Blank") %>% pull(abs_667) %>% mean),
+      # for post-color dilution
+      abs_corr = abs_blk_corr * dilution_post) %>%
+   # remove the samples that were too low and need to be re-run with a lower pre-color dilution
+   anti_join(S3_s01 %>% filter(str_detect(flag, pattern="L"))) %>%
+   # remove the samples that were too high and need to be re-run with a higher pre-color dilution
+   anti_join(S3_s01 %>% filter(str_detect(flag, pattern="H"))) %>%
+   # remove sample dupes
+   filter(!(str_detect(sample_id, pattern="dup"))) %>%
+   # sulfide concentration in microcentrifuge vial that diamine reagent was added to (units = uM)
+   mutate(vial_S_uM = calc_h2s_conc(abs_corr, std_apr25)) %>%
+   # for samples that were below detection limit, concentration = 0
+   mutate(vial_S_uM = replace(vial_S_uM, str_detect(.$flag, pattern="D"), 0))
+
+
+
+#--
 # Porewater Sulfide Concentration
 #--
 
@@ -177,7 +220,7 @@ spatial_pw_sample_data = read.csv("Data/FLK24_spatial_porewater.csv")
 
 
 # Combine spec runs and calculate sulfide concentration (units = uM)
-fk_pw_spatial = bind_rows(S1_s01, S1_s02, S2_s01) %>%
+fk_pw_spatial = bind_rows(S1_s01, S1_s02, S2_s01, S3_s01) %>%
    # correct measured sulfide concentration for any dilution prior to adding diamine reagent (units = uM)
    mutate(scint_S_uM = vial_S_uM * dilution_pre)
 
@@ -186,7 +229,7 @@ fk_pw_spatial = bind_rows(S1_s01, S1_s02, S2_s01) %>%
 fk_pw_spatial = fk_pw_spatial %>%
    select(subsample_id = sample_id, scint_S_uM) %>%
    # make sample ID structure match with sample data file
-   mutate(subsample_id = paste("FLK24-", subsample_id, sep="")) %>% 
+   mutate(subsample_id = paste0("FLK24-", subsample_id)) %>% 
    # combine with sample data
    left_join(spatial_pw_sample_data) %>%
    # calculate porewater S concentration (units = uM)
