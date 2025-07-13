@@ -58,7 +58,7 @@ rm_zbsc = function(.dat) {
 
 #- Surface Porewater, run 1
 # Standard curve to use: April 2025
-raw_S1_s01 = read_csv("Data/Spec Data/2025.04.06 - FLK24_spatial surface porewater_S1.1-1.3.csv") %>%
+raw_S1_s01 = read_csv("Data/Spec Data/2025.04.06 - FLK24_spatial porewater_S1.1-1.3_surface.csv") %>%
    janitor::remove_empty(which = 'rows')
 
 # check measured concentration of standards
@@ -92,7 +92,7 @@ S1_s01 = S1_s01 %>%
 
 #- Surface Porewater, run 2
 # Standard curve to use: April 2025
-raw_S1_s02 = read_csv("Data/Spec Data/2025.04.13 - FLK24_spatial surface porewater_S1.1-1.3 reruns.csv") %>%
+raw_S1_s02 = read_csv("Data/Spec Data/2025.04.13 - FLK24_spatial porewater_S1.1-1.3 reruns_surface.csv") %>%
    janitor::remove_empty(which = 'rows')
 
 # check measured concentration of standards
@@ -120,6 +120,13 @@ S1_s02 = S1_s02 %>%
    mutate(vial_S_uM = replace(vial_S_uM, str_detect(.$flag, pattern="D"), 0))
 
 
+#- Rhizome Porewater, run 1
+# Standard curve to use: April 2025
+raw_S1_r01 = read_csv("Data/Spec Data/2025.07.12 - FLK24_spatial porewater_S1.1-1.3_rhizome.csv") %>%
+   janitor::remove_empty(which = 'rows')
+
+
+
 
 #--
 # Little Conch Key sites - spec data
@@ -129,7 +136,7 @@ S1_s02 = S1_s02 %>%
 
 #- Surface Porewater, run 1
 # Standard curve to use: April 2025
-raw_S2_s01 = read_csv("Data/Spec Data/2025.04.13 - FLK24_spatial surface porewater_S2.1-2.3.csv") %>%
+raw_S2_s01 = read_csv("Data/Spec Data/2025.04.13 - FLK24_spatial porewater_S2.1-2.3_surface.csv") %>%
    janitor::remove_empty(which = 'rows')
 
 # check measured concentration of standards
@@ -176,38 +183,45 @@ S2_s01 = S2_s01 %>%
 
 #- Surface and Rhizome Porewater, run 1
 # Standard curve to use: April 2025
-raw_S3_s01 = read_csv("Data/Spec Data/2025.07.05 - FLK24_spatial surface rhizome porewater_S3.1-3.2.csv") %>%
+raw_S3_01 = read_csv("Data/Spec Data/2025.07.05 - FLK24_spatial porewater_S3.1-3.2_surf and rhiz.csv") %>%
    janitor::remove_empty(which = 'rows')
 
 # check measured concentration of standards
-check_stds(raw_S3_s01, std_apr25)
+check_stds(raw_S3_01, std_apr25)
 
 
 # Pre-process data sheets, remove unnecessary data/rows
-S3_s01 = rm_zbsc(raw_S3_s01)
+S3_01 = rm_zbsc(raw_S3_01)
 
 # check agreement between sample dupes
-S3_s01 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup")))
+S3_01 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup")))
    # all look good
 
 # Sulfide concentration in vials (units = uM)
-S3_s01 = S3_s01 %>%
+S3_01 = S3_01 %>%
    # correct absorbance
    mutate(
       # for blanks
-      abs_blk_corr = abs_667 - (raw_S3_s01 %>% filter(sample_id=="Blank") %>% pull(abs_667) %>% mean),
+      abs_blk_corr = abs_667 - (raw_S3_01 %>% filter(sample_id=="Blank") %>% pull(abs_667) %>% mean),
       # for post-color dilution
       abs_corr = abs_blk_corr * dilution_post) %>%
    # remove the samples that were too low and need to be re-run with a lower pre-color dilution
-   anti_join(S3_s01 %>% filter(str_detect(flag, pattern="L"))) %>%
+   anti_join(S3_01 %>% filter(str_detect(flag, pattern="L"))) %>%
    # remove the samples that were too high and need to be re-run with a higher pre-color dilution
-   anti_join(S3_s01 %>% filter(str_detect(flag, pattern="H"))) %>%
+   anti_join(S3_01 %>% filter(str_detect(flag, pattern="H"))) %>%
    # remove sample dupes
    filter(!(str_detect(sample_id, pattern="dup"))) %>%
    # sulfide concentration in microcentrifuge vial that diamine reagent was added to (units = uM)
    mutate(vial_S_uM = calc_h2s_conc(abs_corr, std_apr25)) %>%
    # for samples that were below detection limit, concentration = 0
    mutate(vial_S_uM = replace(vial_S_uM, str_detect(.$flag, pattern="D"), 0))
+
+
+# Surface samples
+S3_s01 = S3_01 %>% filter(str_detect(sample_id, pattern="-S"))
+
+# Rhizome samples
+S3_r01 = S3_01 %>% filter(str_detect(sample_id, pattern="-R"))
 
 
 
@@ -220,7 +234,7 @@ spatial_pw_sample_data = read.csv("Data/FLK24_spatial_porewater.csv")
 
 
 # Combine spec runs and calculate sulfide concentration (units = uM)
-fk_pw_spatial = bind_rows(S1_s01, S1_s02, S2_s01, S3_s01) %>%
+fk_pw_spatial = bind_rows(S1_s01, S1_s02, S2_s01, S3_s01, S3_r01) %>%
    # correct measured sulfide concentration for any dilution prior to adding diamine reagent (units = uM)
    mutate(scint_S_uM = vial_S_uM * dilution_pre)
 
