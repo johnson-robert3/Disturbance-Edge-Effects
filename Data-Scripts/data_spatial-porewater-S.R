@@ -32,7 +32,7 @@ check_stds = function(.dat, .std_curve) {
       # correct for blank absorbance
       mutate(abs = abs_667 - (.dat %>% filter(sample_id=="Blank") %>% pull(abs_667) %>% mean)) %>%
       # concentration
-      mutate(stdS = calc_h2s_conc(abs, .std_curve),
+      mutate(stdS = calc_S_conc(abs, .std_curve),
              expected = parse_number(sample_id),
              diff = expected - stdS,
              perc_diff = (diff / expected) * 100) %>%
@@ -48,6 +48,26 @@ rm_zbsc = function(.dat) {
              !(str_detect(sample_id, pattern="L")))
 }
 
+# Function to process datasheet and calculate sulfide concentration in microcentrifuge vial
+calc_vial_S = function(.processed, .raw, .std_curve) {
+   
+   .processed %>%
+      # correct absorbance
+      mutate(
+         # for blanks
+         abs_blk_corr = abs_667 - (.raw %>% filter(sample_id=="Blank") %>% pull(abs_667) %>% mean),
+         # for post-color dilution
+         abs_corr = abs_blk_corr * dilution_post) %>%
+      # remove any samples that were too low or too high and need to be re-run with a different pre-color dilution
+      filter(!(flag %in% c("L", "H"))) %>%
+      # remove sample dupes
+      filter(!(str_detect(sample_id, pattern="dup"))) %>%
+      # sulfide concentration in microcentrifuge vial that diamine reagent was added to (units = uM)
+      mutate(vial_S_uM = calc_S_conc(abs_corr, .std_curve)) %>%
+      # for samples that were below detection limit, concentration = 0
+      mutate(vial_S_uM = replace(vial_S_uM, str_detect(.$flag, pattern="D"), 0))
+}
+   
 
 
 #--
@@ -75,19 +95,7 @@ S1_s01 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup
    # S1.3-D-5.0-S: 0.035/0.044 = 0.795; disregard, samples needed to be rerun
 
 # Sulfide concentration in vials (units = uM)
-S1_s01 = S1_s01 %>%
-   # correct absorbance
-   mutate(
-      # for blanks
-      abs_blk_corr = abs_667 - (raw_S1_s01 %>% filter(sample_id=="Blank") %>% pull(abs_667) %>% mean),
-      # for post-color dilution
-      abs_corr = abs_blk_corr * dilution_post) %>%
-   # remove the samples that were too low and need to be re-run with a lower pre-color dilution
-   anti_join(S1_s01 %>% filter(str_detect(flag, pattern="L"))) %>%
-   # remove sample dupes
-   filter(!(str_detect(sample_id, pattern="dup"))) %>%
-   # sulfide concentration in microcentrifuge vial that diamine reagent was added to (units = uM)
-   mutate(vial_S_uM = calc_h2s_conc(abs_corr, std_apr25))
+S1_s01 = calc_vial_S(S1_s01, raw_S1_s01, std_apr25)
 
 
 #- Surface Porewater, run 2
@@ -107,23 +115,15 @@ S1_s02 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup
    # no dupes
 
 # Sulfide concentration in vials (units = uM)
-S1_s02 = S1_s02 %>%
-   # correct absorbance
-   mutate(
-      # for blanks
-      abs_blk_corr = abs_667 - (raw_S1_s02 %>% filter(sample_id=="Blank") %>% pull(abs_667) %>% mean),
-      # for post-color dilution
-      abs_corr = abs_blk_corr * dilution_post) %>%
-   # sulfide concentration in microcentrifuge vial that diamine reagent was added to (units = uM)
-   mutate(vial_S_uM = calc_h2s_conc(abs_corr, std_apr25)) %>%
-   # for samples that were below detection limit, concentration = 0
-   mutate(vial_S_uM = replace(vial_S_uM, str_detect(.$flag, pattern="D"), 0))
+S1_s02 = calc_vial_S(S1_s02, raw_S1_s02, std_apr25)
 
 
 #- Rhizome Porewater, run 1
 # Standard curve to use: April 2025
 raw_S1_r01 = read_csv("Data/Spec Data/2025.07.12 - FLK24_spatial porewater_S1.1-1.3_rhizome.csv") %>%
    janitor::remove_empty(which = 'rows')
+
+## --> {need to finish processing this run}
 
 
 
@@ -153,25 +153,18 @@ S2_s01 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup
    # S2.3-D-5.0-S: 0.54/0.519 = 1.04; difference acceptable
 
 # Sulfide concentration in vials (units = uM)
-S2_s01 = S2_s01 %>%
-   # correct absorbance
-   mutate(
-      # for blanks
-      abs_blk_corr = abs_667 - (raw_S2_s01 %>% filter(sample_id=="Blank") %>% pull(abs_667) %>% mean),
-      # for post-color dilution
-      abs_corr = abs_blk_corr * dilution_post) %>%
-   # remove the samples that were too low and need to be re-run with a lower pre-color dilution
-   anti_join(S2_s01 %>% filter(str_detect(flag, pattern="L"))) %>%
-   # remove the samples that were too high and need to be re-run with a higher pre-color dilution
-   anti_join(S2_s01 %>% filter(str_detect(flag, pattern="H"))) %>%
-   # remove sample dupes
-   filter(!(str_detect(sample_id, pattern="dup"))) %>%
+S2_s01 = calc_vial_S(S2_s01, raw_S2_s01, std_apr25) %>%
    # remove the sample that was rerun with post-dilution (effect of post-dilution is non-linear, this sample needs to be rerun)
-   anti_join(S2_s01 %>% filter(str_detect(notes, pattern="post-dilution"))) %>%
-   # sulfide concentration in microcentrifuge vial that diamine reagent was added to (units = uM)
-   mutate(vial_S_uM = calc_h2s_conc(abs_corr, std_apr25)) %>%
-   # for samples that were below detection limit, concentration = 0
-   mutate(vial_S_uM = replace(vial_S_uM, str_detect(.$flag, pattern="D"), 0))
+   filter(!(dilution_post > 1))
+
+
+#- Surface Porewater, run 2
+# Standard curve to use: April 2025
+raw_S2_s02 = read_csv("Data/Spec Data/2025.07.12 - FLK24_spatial porewater_S2.1-3.2 reruns_surface.csv") %>%
+   janitor::remove_empty(which = 'rows')
+
+## --> {need to finish processing this run}
+
 
 
 
@@ -198,23 +191,7 @@ S3_01 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup"
    # all look good
 
 # Sulfide concentration in vials (units = uM)
-S3_01 = S3_01 %>%
-   # correct absorbance
-   mutate(
-      # for blanks
-      abs_blk_corr = abs_667 - (raw_S3_01 %>% filter(sample_id=="Blank") %>% pull(abs_667) %>% mean),
-      # for post-color dilution
-      abs_corr = abs_blk_corr * dilution_post) %>%
-   # remove the samples that were too low and need to be re-run with a lower pre-color dilution
-   anti_join(S3_01 %>% filter(str_detect(flag, pattern="L"))) %>%
-   # remove the samples that were too high and need to be re-run with a higher pre-color dilution
-   anti_join(S3_01 %>% filter(str_detect(flag, pattern="H"))) %>%
-   # remove sample dupes
-   filter(!(str_detect(sample_id, pattern="dup"))) %>%
-   # sulfide concentration in microcentrifuge vial that diamine reagent was added to (units = uM)
-   mutate(vial_S_uM = calc_h2s_conc(abs_corr, std_apr25)) %>%
-   # for samples that were below detection limit, concentration = 0
-   mutate(vial_S_uM = replace(vial_S_uM, str_detect(.$flag, pattern="D"), 0))
+S3_01 = calc_vial_S(S3_01, raw_S3_01, std_apr25)
 
 
 # Surface samples

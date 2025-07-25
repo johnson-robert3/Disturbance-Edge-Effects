@@ -54,7 +54,7 @@ summary(lm(conc_uM ~ abs_corr, data = std_apr25))  # R2 = 0.995
 
 # lm(conc_uM ~ abs_df_corr, data = std_curve) %>% coef()
 
-calc_h2s_conc = function(.abs, .std_curve) {
+calc_S_conc = function(.abs, .std_curve) {
    
    intercept = coef(lm(conc_uM ~ abs_corr, data = .std_curve))[[1]]
    slope = coef(lm(conc_uM ~ abs_corr, data = .std_curve))[[2]]
