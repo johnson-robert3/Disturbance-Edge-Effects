@@ -170,13 +170,43 @@ S2_s01 = calc_vial_S(S2_s01, raw_S2_s01, std_apr25) %>%
    filter(!(dilution_post > 1))
 
 
-#- Surface Porewater, run 2
+#-- Surface Porewater, run 2 --#
 # Standard curve to use: April 2025
 raw_S2_s02 = read_csv("Data/Spec Data/2025.07.12 - FLK24_spatial porewater_S2.1-3.2 reruns_surface.csv") %>%
    janitor::remove_empty(which = 'rows')
 
-## --> {need to finish processing this run}
+# check measured concentration of standards
+check_stds(raw_S2_s02, std_apr25)
 
+
+# Pre-process data sheets, remove unnecessary data/rows
+S2_s02 = rm_zbsc(raw_S2_s02)
+
+# check agreement between sample dupes
+S2_s02 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup")))
+   # S2.3-D-4.0-S: 0.606/0.618 = 0.98; difference acceptable
+
+# Sulfide concentration in vials (units = uM)
+S2_s02 = calc_vial_S(S2_s02, raw_S2_s02, std_apr25)
+
+
+#-- Rhizome Porewater, run 1 --#
+# Standard curve to use: April 2025
+raw_S2_r01 = read_csv("Data/Spec Data/2025.07.26 - FLK24_spatial porewater_S2.1-2.3, S3.2_rhizome.csv") %>%
+   janitor::remove_empty(which = 'rows')
+
+# check measured concentration of standards
+check_stds(raw_S2_r01, std_apr25)
+
+# --> all standards were a bit off today. compare to std. values from recent runs and determine how far off.
+#      may need to apply correction factor to absorbance values for all samples run on 2025.07.26
+
+# --> need to remove S3.2 data when processing this df. process this same sheet for S3.2 under Anne's Beach below
+
+# { need to finish processing this }
+
+
+## --> there are also re-runs in the file "2025.07.26 - FLK24_porewater reruns from 07.26 run.csv"
 
 
 
@@ -186,7 +216,7 @@ raw_S2_s02 = read_csv("Data/Spec Data/2025.07.12 - FLK24_spatial porewater_S2.1-
 
 # Sites S3.1, S3.2
 
-#- Surface and Rhizome Porewater, run 1
+#-- Surface and Rhizome Porewater, run 1 --#
 # Standard curve to use: April 2025
 raw_S3_01 = read_csv("Data/Spec Data/2025.07.05 - FLK24_spatial porewater_S3.1-3.2_surf and rhiz.csv") %>%
    janitor::remove_empty(which = 'rows')
