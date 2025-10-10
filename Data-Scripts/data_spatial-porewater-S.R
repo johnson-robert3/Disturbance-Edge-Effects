@@ -243,6 +243,26 @@ S3_s01 = S3_01 %>% filter(str_detect(sample_id, pattern="-S"))
 S3_r01 = S3_01 %>% filter(str_detect(sample_id, pattern="-R"))
 
 
+#-- Rhizome Porewater, run 2 --#
+# Standard curve to use: April 2025
+raw_S3_r02 = read_csv("Data/Spec Data/2025.07.26 - FLK24_spatial porewater_S2.1-2.3, S3.2_rhizome.csv") %>%
+   janitor::remove_empty(which = 'rows')
+
+# check measured concentration of standards
+check_stds(raw_S3_r02, std_apr25)
+
+# --> all standards were a bit off today. compare to std. values from recent runs and determine how far off.
+#      may need to apply correction factor to absorbance values for all samples run on 2025.07.26
+
+# --> need to remove S2.1-S2.3 data when processing this df. only process S3.2 data here
+
+# { need to finish processing this }
+
+
+## --> there are also re-runs in the file "2025.07.26 - FLK24_porewater reruns from 07.26 run.csv"
+
+
+
 
 #--
 # Porewater Sulfide Concentration
@@ -253,7 +273,7 @@ spatial_pw_sample_data = read.csv("Data/FLK24_spatial_porewater.csv")
 
 
 # Combine spec runs and calculate sulfide concentration (units = uM)
-fk_pw_spatial = bind_rows(S1_s01, S1_s02, S2_s01, S3_s01, S3_r01) %>%
+fk_pw_spatial = bind_rows(S1_s01, S1_s02, S1_r01, S2_s01, S2_s02, S3_s01, S3_r01) %>%
    # correct measured sulfide concentration for any dilution prior to adding diamine reagent (units = uM)
    mutate(scint_S_uM = vial_S_uM * dilution_pre)
 
@@ -265,6 +285,7 @@ fk_pw_spatial = fk_pw_spatial %>%
    mutate(subsample_id = paste0("FLK24-", subsample_id)) %>% 
    # combine with sample data
    left_join(spatial_pw_sample_data) %>%
+   relocate(scint_S_uM, .after=last_col()) %>%
    # calculate porewater S concentration (units = uM)
    mutate(
       # total S in vial (concentration times total aqueous volume)
