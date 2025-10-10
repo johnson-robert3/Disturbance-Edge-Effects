@@ -76,7 +76,7 @@ calc_vial_S = function(.processed, .raw, .std_curve) {
 
 # Sites S1.1, S1.2, S1.3
 
-#- Surface Porewater, run 1
+#-- Surface Porewater, run 1 --#
 # Standard curve to use: April 2025
 raw_S1_s01 = read_csv("Data/Spec Data/2025.04.06 - FLK24_spatial porewater_S1.1-1.3_surface.csv") %>%
    janitor::remove_empty(which = 'rows')
@@ -98,7 +98,7 @@ S1_s01 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup
 S1_s01 = calc_vial_S(S1_s01, raw_S1_s01, std_apr25)
 
 
-#- Surface Porewater, run 2
+#-- Surface Porewater, run 2 --#
 # Standard curve to use: April 2025
 raw_S1_s02 = read_csv("Data/Spec Data/2025.04.13 - FLK24_spatial porewater_S1.1-1.3 reruns_surface.csv") %>%
    janitor::remove_empty(which = 'rows')
@@ -118,13 +118,25 @@ S1_s02 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup
 S1_s02 = calc_vial_S(S1_s02, raw_S1_s02, std_apr25)
 
 
-#- Rhizome Porewater, run 1
+#-- Rhizome Porewater, run 1 --#
 # Standard curve to use: April 2025
 raw_S1_r01 = read_csv("Data/Spec Data/2025.07.12 - FLK24_spatial porewater_S1.1-1.3_rhizome.csv") %>%
    janitor::remove_empty(which = 'rows')
 
-## --> {need to finish processing this run}
+# check measured concentration of standards
+check_stds(raw_S1_r01, std_apr25)
 
+
+# Pre-process data sheets, remove unnecessary data/rows
+S1_r01 = rm_zbsc(raw_S1_r01)
+
+# check agreement between sample dupes
+S1_r01 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup")))
+   # S1.2-D-5.0-R: 0.097 / 0.115 = 0.843  # ??
+   # S1.3-D-5.0-R: 0.204 / 0.212 = 0.962  # acceptable
+
+# Sulfide concentration in vials (units = uM)
+S1_r01 = calc_vial_S(S1_r01, raw_S1_r01, std_apr25)
 
 
 
@@ -134,7 +146,7 @@ raw_S1_r01 = read_csv("Data/Spec Data/2025.07.12 - FLK24_spatial porewater_S1.1-
 
 # Sites S2.1, S2.2, S2.3
 
-#- Surface Porewater, run 1
+#-- Surface Porewater, run 1 --#
 # Standard curve to use: April 2025
 raw_S2_s01 = read_csv("Data/Spec Data/2025.04.13 - FLK24_spatial porewater_S2.1-2.3_surface.csv") %>%
    janitor::remove_empty(which = 'rows')
