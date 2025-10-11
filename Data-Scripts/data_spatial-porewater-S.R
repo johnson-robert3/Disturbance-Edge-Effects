@@ -197,37 +197,6 @@ S2_s02 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup
 S2_s02 = calc_vial_S(S2_s02, raw_S2_s02, std_apr25)
 
 
-#-- Rhizome Porewater, run 1 --#
-# July 26, 2025
-# Standard curve to use: April 2025
-raw_S2_r01 = read_csv("Data/Spec Data/2025.07.26 - FLK24_spatial porewater_S2.1-2.3, S3.2_rhizome.csv") %>%
-   janitor::remove_empty(which = 'rows')
-
-# check measured concentration of standards
-check_stds(raw_S2_r01, std_apr25)
-
-# --> all standards were a bit off today. compare to std. values from recent runs and determine how far off.
-#      may need to apply correction factor to absorbance values for all samples run on 2025.07.26
-
-
-# Pre-process data sheets, remove unnecessary data/rows
-S2_r01 = rm_zbsc(raw_S2_r01) %>%
-   # remove S3.2 data (processed under Anne's Beach below)
-   filter(!str_detect(sample_id, pattern="S3.2"))
-
-# check agreement between sample dupes
-S2_r01 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup")))
-   # S2.1-D-5.0-R: 0.033 /0.031  = 1.06; difference acceptable (this sample was discarded and run with a different df)
-   # S2.2-D-5.0-R: 0.59 /0.614  = 0.96; difference acceptable
-   # S2.3-D-5.0-R: 0.165 /0.179  = 0.92; difference acceptable
-
-# Sulfide concentration in vials (units = uM)
-S2_r01 = calc_vial_S(S2_r01, raw_S2_r01, std_apr25)
-
-
-## --> there are also re-runs in the file "2025.07.26 - FLK24_porewater reruns from 07.26 run.csv"
-
-
 
 #--
 # Anne's Beach sites - spec data
@@ -256,33 +225,62 @@ S3_01 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup"
 S3_01 = calc_vial_S(S3_01, raw_S3_01, std_apr25)
 
 
-#-- Rhizome Porewater, run 2 --#
-# 
+
+#--
+# Processing runs that are difficult/unnecessary to split between sites
+#--
+
+#-- Rhizome Porewater, sites 2 and 3 --#
+# July 26, 2025
 # Standard curve to use: April 2025
-raw_S3_r02 = read_csv("Data/Spec Data/2025.07.26 - FLK24_spatial porewater_S2.1-2.3, S3.2_rhizome.csv") %>%
+raw_S2_S3_r = read_csv("Data/Spec Data/2025.07.26 - FLK24_spatial porewater_S2.1-2.3, S3.2_rhizome.csv") %>%
    janitor::remove_empty(which = 'rows')
 
 # check measured concentration of standards
-check_stds(raw_S3_r02, std_apr25)
+check_stds(raw_S2_S3_r, std_apr25)
 
 # --> all standards were a bit off today. compare to std. values from recent runs and determine how far off.
 #      may need to apply correction factor to absorbance values for all samples run on 2025.07.26
 
 
 # Pre-process data sheets, remove unnecessary data/rows
-S3_r02 = rm_zbsc(raw_S3_r02) %>%
-   # remove S2.1 - 2.3 data (processed under Little Conch above)
-   filter(str_detect(sample_id, pattern="S3.2"))
+S2_S3_r = rm_zbsc(raw_S2_S3_r)
 
 # check agreement between sample dupes
-S3_r02 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup")))
+S2_S3_r %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup")))
+   # S2.1-D-5.0-R: 0.033 /0.031  = 1.06; difference acceptable (this sample was discarded and run with a different df)
+   # S2.2-D-5.0-R: 0.59 /0.614  = 0.96; difference acceptable
+   # S2.3-D-5.0-R: 0.165 /0.179  = 0.92; difference acceptable
    # S3.2-D-5.0-R: 0.12 /0.108 = 1.11; difference iffy, 11% off
 
 # Sulfide concentration in vials (units = uM)
-S3_r02 = calc_vial_S(S3_r02, raw_S3_r02, std_apr25)
+S2_S3_r = calc_vial_S(S2_S3_r, raw_S2_S3_r, std_apr25)
 
 
-## --> there are also re-runs in the file "2025.07.26 - FLK24_porewater reruns from 07.26 run.csv"
+#-- Rhizome Porewater, reruns, sites 2 and 3 --#
+# July 26, 2025
+# Standard curve to use: April 2025
+raw_S2_S3_r2 = read_csv("Data/Spec Data/2025.07.26 - FLK24_porewater reruns from 07.26 run.csv") %>%
+   janitor::remove_empty(which = 'rows')
+
+# check measured concentration of standards
+check_stds(raw_S2_S3_r2, std_apr25)
+
+# --> all standards were a bit off today. compare to std. values from recent runs and determine how far off.
+#      may need to apply correction factor to absorbance values for all samples run on 2025.07.26
+
+# Pre-process data sheets, remove unnecessary data/rows
+S2_S3_r2 = rm_zbsc(raw_S2_S3_r2)
+
+# check agreement between sample dupes
+S2_S3_r2 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup")))
+   # no dupes
+
+# Sulfide concentration in vials (units = uM)
+S2_S3_r2 = calc_vial_S(S2_S3_r2, raw_S2_S3_r2, std_apr25) %>%
+   # remove vertical porewater samples, keep only spatial
+   filter(str_detect(sample_id, "-R"))
+
 
 
 
@@ -295,7 +293,7 @@ spatial_pw_sample_data = read.csv("Data/FLK24_spatial_porewater.csv")
 
 
 # Combine spec runs and calculate sulfide concentration (units = uM)
-fk_pw_spatial = bind_rows(S1_s01, S1_s02, S1_r01, S2_s01, S2_s02, S2_r01, S3_01, S3_r02) %>%
+fk_pw_spatial = bind_rows(S1_s01, S1_s02, S1_r01, S2_s01, S2_s02, S3_01, S2_S3_r, S2_S3_r2) %>%
    # correct measured sulfide concentration for any dilution prior to adding diamine reagent (units = uM)
    mutate(scint_S_uM = vial_S_uM * dilution_pre)
 
