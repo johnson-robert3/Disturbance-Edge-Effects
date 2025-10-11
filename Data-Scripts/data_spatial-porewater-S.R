@@ -256,13 +256,6 @@ S3_01 %>% filter(str_detect(sample_id, "dup") | lead(str_detect(sample_id, "dup"
 S3_01 = calc_vial_S(S3_01, raw_S3_01, std_apr25)
 
 
-# Surface samples
-S3_s01 = S3_01 %>% filter(str_detect(sample_id, pattern="-S"))
-
-# Rhizome samples
-S3_r01 = S3_01 %>% filter(str_detect(sample_id, pattern="-R"))
-
-
 #-- Rhizome Porewater, run 2 --#
 # 
 # Standard curve to use: April 2025
@@ -302,7 +295,7 @@ spatial_pw_sample_data = read.csv("Data/FLK24_spatial_porewater.csv")
 
 
 # Combine spec runs and calculate sulfide concentration (units = uM)
-fk_pw_spatial = bind_rows(S1_s01, S1_s02, S1_r01, S2_s01, S2_s02, S2_r01, S3_s01, S3_r01, S3_r02) %>%
+fk_pw_spatial = bind_rows(S1_s01, S1_s02, S1_r01, S2_s01, S2_s02, S2_r01, S3_01, S3_r02) %>%
    # correct measured sulfide concentration for any dilution prior to adding diamine reagent (units = uM)
    mutate(scint_S_uM = vial_S_uM * dilution_pre)
 
