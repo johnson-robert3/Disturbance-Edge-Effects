@@ -2,10 +2,10 @@
 
 
 
-fk_breaks = c('disturbed', 'undisturbed')
+fk_breaks = c('unvegetated', 'vegetated')
 # fk_site_cols = c('LP' = '#C63D2F', 'CG' = '#FF9B50', 'CH' = '#002B5B', 'CW' = '#159895')
 fk_site_cols = c('1' = '#C63D2F', '2' = '#FF9B50', '3' = '#002B5B')
-fk_shapes = c('disturbed' = 22, 'undisturbed' = 15)
+fk_shapes = c('unvegetated' = 22, 'vegetated' = 15)
 
 
 
@@ -18,7 +18,7 @@ ggplot(fk_pw_spatial %>%
    # 
    scale_y_continuous(name = expression(Porewater~sulfide~(mu*M))) +
    scale_color_manual(breaks = fk_breaks, 
-                      values = c('disturbed' = 'cornflowerblue', 'undisturbed' = 'black')) +
+                      values = c('unvegetated' = 'cornflowerblue', 'vegetated' = 'black')) +
    # xlab("FK sites") +
    theme_classic() +
    theme(panel.border = element_rect(color="black", fill=NA))
@@ -35,7 +35,7 @@ ggplot(fk_pw_spatial %>%
    # 
    scale_y_continuous(name = expression(Porewater~sulfide~(mu*M))) +
    scale_color_manual(breaks = fk_breaks, 
-                      values = c('disturbed' = 'cornflowerblue', 'undisturbed' = 'black')) +
+                      values = c('unvegetated' = 'cornflowerblue', 'vegetated' = 'black')) +
    facet_wrap(facets = vars(patch)) +
    # xlab("FK sites") +
    theme_classic() +
@@ -53,7 +53,7 @@ ggplot(fk_pw_spatial %>%
    # 
    scale_y_continuous(name = expression(Porewater~sulfide~(mu*M))) +
    scale_color_manual(breaks = fk_breaks, 
-                      values = c('disturbed' = 'cornflowerblue', 'undisturbed' = 'black')) +
+                      values = c('unvegetated' = 'cornflowerblue', 'vegetated' = 'black')) +
    facet_wrap(facets = vars(patch)) +
    # xlab("FK sites") +
    theme_classic() +
@@ -70,7 +70,7 @@ ggplot(fk_pw_spatial %>%
    # 
    scale_y_continuous(name = expression(Porewater~sulfide~(mu*M))) +
    scale_color_manual(breaks = fk_breaks, 
-                      values = c('disturbed' = 'cornflowerblue', 'undisturbed' = 'black')) +
+                      values = c('unvegetated' = 'cornflowerblue', 'vegetated' = 'black')) +
    facet_wrap(facets = vars(site), labeller = label_both) +
    # xlab("FK sites") +
    theme_classic() +
@@ -80,7 +80,7 @@ ggplot(fk_pw_spatial %>%
 # based on transect position (distance from edge), all together
 windows(height=3.5, width=5)
 ggplot(fk_pw_spatial %>%
-          mutate(transect_location_m = if_else(treatment=="disturbed", transect_location_m * -1, transect_location_m))) +
+          mutate(transect_location_m = if_else(treatment=="unvegetated", transect_location_m * -1, transect_location_m))) +
    #
    geom_line(aes(x = transect_location_m, y = porewater_S_uM, group = interaction(site_id, treatment), linetype = treatment, color = site_id)) +
    geom_point(aes(x = transect_location_m, y = porewater_S_uM, fill = site_id), shape = 21, size=3) +
@@ -96,7 +96,7 @@ ggplot(fk_pw_spatial %>%
 # based on transect position (distance from edge), by site
 windows(height=3.5, width=8)
 ggplot(fk_pw_spatial %>%
-          mutate(transect_location_m = if_else(treatment=="disturbed", transect_location_m * -1, transect_location_m))) +
+          mutate(transect_location_m = if_else(treatment=="unvegetated", transect_location_m * -1, transect_location_m))) +
    #
    geom_line(aes(x = transect_location_m, y = porewater_S_uM, group = interaction(site_id, treatment, sample_depth), linetype = treatment, color = site_id), alpha=0.5) +
    geom_smooth(aes(x = transect_location_m, y = porewater_S_uM, group = treatment), color="black", linewidth=1.5) +

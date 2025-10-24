@@ -8,9 +8,8 @@ library(tidyverse)
 setwd("C:/Users/rajohnson6/Box/Projects/Seagrass Disturbance")
 
 
-# 
-# need to run "XX" script first to create meadow datasets
-# source("C:/Users/rajohnson6/Desktop/Local-Repos/Disturbance-Edge-Effects/Data-Scripts/data_S-std-curves.R")
+# need to run "data_meadow-data" script first to create meadow datasets
+source("C:/Users/rajohnson6/Desktop/Local-Repos/Disturbance-Edge-Effects/Data-Scripts/data_meadow-data.R")
 
 
 # Figures
