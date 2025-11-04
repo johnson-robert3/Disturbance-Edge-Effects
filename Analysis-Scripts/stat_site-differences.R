@@ -9,32 +9,41 @@ library(AER)
 library(glmmTMB)
 library(ggResidpanel)
 
+set.seed(123)
+
 
 #- Surface porewater S -# 
 
 # is surface pwS sig. diff. between sites? 
 aov(log(surface_pwS) ~ site_name, meadow) %>% summary  # no; p = 0.29
 
-pws.a1 = aov(surface_pwS ~ site_name, meadow)
-qqnorm(residuals(pws.a1))
+pws.a1 = aov(surface_pwS ~ site_name, meadow %>% filter(!(is.na(surface_pwS))))
+qqnorm(residuals(pws.a1))  # non-normal
 
-pws.a2 = aov(log(surface_pwS) ~ site_name, meadow)
-qqnorm(residuals(pws.a2))
+pws.a2 = aov(log(surface_pwS) ~ site_name, meadow %>% filter(!(is.na(surface_pwS))))
+qqnorm(residuals(pws.a2))  # good
 
-pws.l1 = lm(surface_pwS ~ site_name, meadow)
+pws.l1 = lm(surface_pwS ~ site_name, meadow %>% filter(!(is.na(surface_pwS))))
 qqnorm(residuals(pws.l1))
 
-pws.l2 = lm(log(surface_pwS) ~ site_name, meadow)
+pws.l2 = lm(log(surface_pwS) ~ site_name, meadow %>% filter(!(is.na(surface_pwS))))
 qqnorm(residuals(pws.l2))
+
+# lm and aov produce same results
 
 
 # trying an LME
 pws.m1 = lme(surface_pwS ~ site_name, random = ~1|site_id, data = meadow %>% filter(!(is.na(surface_pwS))))
-qqnorm(residuals(pws.m1))
+qqnorm(residuals(pws.m1))  # not great
 
 pws.m2 = lme(log(surface_pwS) ~ site_name, random = ~1|site_id, data = meadow %>% filter(!(is.na(surface_pwS))))
-qqnorm(residuals(pws.m2))
+qqnorm(residuals(pws.m2))  # better, not as smooth as lm or aov
 
+# gls, remove random effect
+pws.m3 = gls(log(surface_pwS) ~ site_name, data = meadow %>% filter(!(is.na(surface_pwS))))
+qqnorm(residuals(pws.m3))
+
+anova(pws.m3, pws.m2)  # m2, lme() with random effects is better
 
 
 # is surface pwS sig. diff. between treatments? 
@@ -48,14 +57,30 @@ qqnorm(residuals(pws.l4))
 
 
 # trying an LME
-pws.m3 = lme(surface_pwS ~ treatment + site_name, random = ~1|site_id, meadow %>% filter(!(is.na(surface_pwS))))
-qqnorm(residuals(pws.m3))
-resid_panel(pws.m3)
 
-pws.m4 = lme(log(surface_pwS) ~ treatment + site_name, random = ~1|site_id, meadow %>% filter(!(is.na(surface_pwS))))
+# treatment and site together
+pws.m4 = lme(surface_pwS ~ treatment + site_name, random = ~1|site_id, meadow %>% filter(!(is.na(surface_pwS))))
 qqnorm(residuals(pws.m4))
 resid_panel(pws.m4)
 
+pws.m5 = lme(log(surface_pwS) ~ treatment + site_name, random = ~1|site_id, meadow %>% filter(!(is.na(surface_pwS))), method="ML")
+qqnorm(residuals(pws.m5))
+resid_panel(pws.m5)  # very good fit; m5 is a good model for surface porewater sulfide
+summary(pws.m5)
+
+# with an interaction term
+pws.m6 = lme(log(surface_pwS) ~ treatment * site_name, random = ~1|site_id, meadow %>% filter(!(is.na(surface_pwS))), method="ML")
+qqnorm(residuals(pws.m6))
+resid_panel(pws.m6)  # very good fit
+
+anova(pws.m6, pws.m5)  # not significant; simpler m5, without interaction, is the best model for surface sulfide
+
+# contrasts
+emmeans(pws.m5, ~treatment|site_name)
+contrast(emmeans(pws.m5, ~treatment), method="pairwise")
+## difference in surface PW sulfide between Veg and Unveg treatments is not sig (but p = 0.089)
+contrast(emmeans(pws.m5, ~site_name), method="pairwise")
+## no differences between sites
 
 
 
@@ -64,9 +89,50 @@ resid_panel(pws.m4)
 # is rhizome pwS sig. diff. between sites? 
 aov(log(rhizome_pwS) ~ site_name, meadow) %>% summary  # no; p = 0.7
 
+pwr.a1 = aov(rhizome_pwS ~ site_name, meadow %>% filter(!(is.na(rhizome_pwS))))
+qqnorm(residuals(pwr.a1))
+
+pwr.a2 = aov(log(rhizome_pwS) ~ site_name, meadow %>% filter(!(is.na(rhizome_pwS))))
+qqnorm(residuals(pwr.a2))
+
+# trying lme
+pwr.m1 = lme(rhizome_pwS ~ site_name, random = ~1|site_id, meadow %>% filter(!(is.na(rhizome_pwS))))
+qqnorm(residuals(pwr.m1))
+
+pwr.m2 = lme(log(rhizome_pwS) ~ site_name, random = ~1|site_id, meadow %>% filter(!(is.na(rhizome_pwS))))
+qqnorm(residuals(pwr.m2))
+
+pwr.m3 = gls(log(rhizome_pwS) ~ site_name, meadow %>% filter(!(is.na(rhizome_pwS))))
+qqnorm(residuals(pwr.m3))
+
+anova(pwr.m2, pwr.m3)  # not sig., simpler gls model without random effects is better
+
 
 # is rhizome pwS diff. between treatments? 
 t.test(log(rhizome_pwS) ~ treatment, meadow)  # no; p = 0.12
+
+# trying an lme
+
+# site and treatment together
+pwr.m4 = lme(rhizome_pwS ~ treatment + site_name, random = ~1|site_id, meadow %>% filter(!(is.na(rhizome_pwS))))
+qqnorm(residuals(pwr.m4))
+
+pwr.m5 = lme(log(rhizome_pwS) ~ treatment + site_name, random = ~1|site_id, meadow %>% filter(!(is.na(rhizome_pwS))), method="ML")
+qqnorm(residuals(pwr.m5))
+
+# with interaction
+pwr.m6 = lme(log(rhizome_pwS) ~ treatment * site_name, random = ~1|site_id, meadow %>% filter(!(is.na(rhizome_pwS))), method="ML")
+qqnorm(residuals(pwr.m6))
+
+anova(pwr.m5, pwr.m6)  # not sig., simpler model m5 without interaction is better
+
+
+# contrasts
+emmeans(pwr.m5, ~treatment|site_name)
+contrast(emmeans(pwr.m5, ~treatment), method="pairwise")
+## difference in rhizome PW sulfide between Veg and Unveg treatments is not sig (p = 0.28)
+contrast(emmeans(pwr.m5, ~site_name), method="pairwise")
+## no differences between sites
 
 
 
@@ -79,7 +145,7 @@ t.test(log(rhizome_pwS) ~ treatment, meadow)  # no; p = 0.12
 mod.bd = lme(dbd ~ site_name * treatment, random = ~1|site_id, data = meadow)
 summary(mod.bd)
 Anova(mod.bd, type=3)
-qqnorm(residuals(mod.bd))
+qqnorm(residuals(mod.bd))  # possible outlier values at the low end
 
 emmeans(mod.bd, ~treatment|site_name)
 contrast(emmeans(mod.bd, ~treatment|site_name),
@@ -105,11 +171,12 @@ contrast(emmeans(mod.bd1, ~treatment|site_name),
 mod.om = lme(perc_om ~ site_name * treatment, random = ~1|site_id, data = meadow)
 summary(mod.om)
 Anova(mod.om, type=3)
-qqnorm(residuals(mod.om))
+qqnorm(residuals(mod.om))  # possible outlier values at the high end
 
 emmeans(mod.om, ~treatment|site_name)
 contrast(emmeans(mod.om, ~treatment|site_name),
          method = "pairwise")
+## OM is sig. greater in Veg areas at Craig and Conch, no diff. between treatments at Anne's
 
 # gls (no random effect)
 mod.om2 = gls(perc_om ~ site_name * treatment, data = meadow)
