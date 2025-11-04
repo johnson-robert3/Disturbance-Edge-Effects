@@ -7,11 +7,39 @@ library(nlme)
 library(AER)
 
 
+#- Is porewater sulfide related to distance from the seagrass edge? 
 
-# Is surface PW influenced by distance from the edge? 
+# Surface S
+
+mod.s1 = lme(log(surface_pwS) ~ (site_name + treatment) * transect_location_m, 
+             random= ~1|site_id, 
+             meadow %>% filter(!(is.na(surface_pwS))))
+qqnorm(residuals(mod.s1))
+summary(mod.s1)
+
+mod.s2 = gls(log(surface_pwS) ~ (site_name + treatment) * transect_location_m, 
+             meadow %>% filter(!(is.na(surface_pwS))))
+qqnorm(residuals(mod.s2))
+
+anova(mod.s1, mod.s2)  # mod s1 with random effect is better
+
+mod.s3 = lme(log(surface_pwS) ~ site_name + treatment + transect_location_m + site_name:transect_location_m + treatment:transect_location_m + site_name:treatment:transect_location_m,
+             random= ~1|site_id, 
+             meadow %>% filter(!(is.na(surface_pwS))))
+summary(mod.s3)
+
+mod.s4 = lme(log(surface_pwS) ~ site_name + treatment * transect_location_m,
+             random= ~1|site_id, 
+             meadow %>% filter(!(is.na(surface_pwS))))
+qqnorm(residuals(mod.s4))
+summary(mod.s4)
+
+
 
 
 # Is rhizome PW influenced by distance from the edge? 
+
+
 
 
 
