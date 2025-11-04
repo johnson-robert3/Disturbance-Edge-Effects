@@ -9,33 +9,9 @@ library(AER)
 
 
 # Is surface PW influenced by distance from the edge? 
-AER::tobit(log(surface_pwS+0.001) ~ transect_location_m * treatment, left=log(0.001), data=meadow) %>% summary  # no
-
-AER::tobit(log(surface_pwS+0.001) ~ transect_location_m * site_name, left=log(0.001), data=meadow) %>% summary  # no
-
-AER::tobit(log(surface_pwS+0.001) ~ transect_location_m + site_name, left=log(0.001), data=meadow) %>% summary  # no
-
-AER::tobit(log(surface_pwS+0.001) ~ transect_location_m, left=log(0.001), data=meadow) %>% summary  # no
-
-AER::tobit(log(surface_pwS+0.001) ~ transect_location_m + treatment, left=log(0.001), data=meadow) %>% 
-   emmeans(., ~treatment) %>%
-   contrast(., method="pairwise")
-## surface sulfide does not vary w/ distance from the edge
-## p = 0.056; sulfide lower in vegetated areas; this result already in the 'stat_site-site-differences' script
 
 
 # Is rhizome PW influenced by distance from the edge? 
-AER::tobit(log(rhizome_pwS+0.001) ~ transect_location_m * treatment, left=log(0.001), data=meadow) %>% summary  # no
-
-AER::tobit(log(rhizome_pwS+0.001) ~ transect_location_m * site_name, left=log(0.001), data=meadow) %>% summary  # no
-
-AER::tobit(log(rhizome_pwS+0.001) ~ transect_location_m, left=log(0.001), data=meadow) %>% summary  # no
-
-AER::tobit(log(rhizome_pwS+0.001) ~ transect_location_m * (site_id + treatment), left=log(0.001), data=meadow) %>% summary  # no
-## rhizome sulfide does not vary w/ distance from the edge
-## does not vary among sites/patches
-## only sig. effect is treatment (veg/unveg); 
-## p = 0.04; rhizome sulfide is lower in veg treatment; this result already in the 'stat_site-site-differences' script
 
 
 
