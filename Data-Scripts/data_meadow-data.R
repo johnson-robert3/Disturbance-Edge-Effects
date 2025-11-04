@@ -20,7 +20,7 @@ raw_rhizomes = read_csv("Data/FLK24_rhizomes.csv")
 site_data = read_csv("Data/FLK24_site_data.csv")
 
 
-#- Seagrass
+#- Seagrass -# 
 
 # areal density of variables (seagrass, macroalgae, burrows, etc.)
 density = raw_meadow_parameters %>%
@@ -90,7 +90,8 @@ seagrass = density %>%
                 select(site_id, treatment, transect_location_m, rhizome_top_cm, rhizome_bottom_cm, bg_biomass))
 
 
-#- Sediment
+#- Sediment -#
+
 sed = raw_spatial_dbd %>%
    mutate(dry_mass = dry_mass_g - wp_mass_g,
           wet_mass = wet_mass_g - wp_mass_g,
@@ -103,7 +104,9 @@ sed = raw_spatial_dbd %>%
           perc_om = (om_drymass - om_ashmass) / om_drymass * 100)
 
 
-#- Combined meadow parameter dataset (combine seagrass, sediment, and porewater)
+#- Meadow parameter dataset -#
+
+# combine seagrass, sediment, and porewater
 meadow = seagrass %>%
    full_join(sed %>%
                 select(site_id, treatment, transect_location_m, dbd, porosity, perc_om)) %>%
