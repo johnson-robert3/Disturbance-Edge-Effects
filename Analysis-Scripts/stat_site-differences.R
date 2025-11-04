@@ -76,10 +76,10 @@ resid_panel(pws.m6)  # very good fit
 anova(pws.m6, pws.m5)  # not significant; simpler m5, without interaction, is the best model for surface sulfide
 
 # contrasts
-emmeans(pws.m5, ~treatment|site_name)
-contrast(emmeans(pws.m5, ~treatment), method="pairwise")
-## difference in surface PW sulfide between Veg and Unveg treatments is not sig (but p = 0.089)
-contrast(emmeans(pws.m5, ~site_name), method="pairwise")
+emmeans(update(pws.m5, method="REML"), ~treatment|site_name)
+contrast(emmeans(update(pws.m5, method="REML"), ~treatment), method="pairwise")
+## difference in surface PW sulfide between Veg and Unveg treatments is not sig (but p = 0.09)
+contrast(emmeans(update(pws.m5, method="REML"), ~site_name), method="pairwise")
 ## no differences between sites
 
 
@@ -128,10 +128,10 @@ anova(pwr.m5, pwr.m6)  # not sig., simpler model m5 without interaction is bette
 
 
 # contrasts
-emmeans(pwr.m5, ~treatment|site_name)
-contrast(emmeans(pwr.m5, ~treatment), method="pairwise")
-## difference in rhizome PW sulfide between Veg and Unveg treatments is not sig (p = 0.28)
-contrast(emmeans(pwr.m5, ~site_name), method="pairwise")
+emmeans(update(pwr.m5, method="REML"), ~treatment|site_name)
+contrast(emmeans(update(pwr.m5, method="REML"), ~treatment), method="pairwise")
+## difference in rhizome PW sulfide between Veg and Unveg treatments is not sig (p = 0.24)
+contrast(emmeans(update(pwr.m5, method="REML"), ~site_name), method="pairwise")
 ## no differences between sites
 
 
@@ -150,6 +150,7 @@ qqnorm(residuals(mod.bd))  # possible outlier values at the low end
 emmeans(mod.bd, ~treatment|site_name)
 contrast(emmeans(mod.bd, ~treatment|site_name),
          method = "pairwise")
+## DBD is sig. greater in Unveg patches at all sites
 
 # standard anova
 mod.bd1 = aov(dbd ~ treatment * site_name, data = meadow)
