@@ -315,3 +315,12 @@ fk_pw_spatial = fk_pw_spatial %>%
 
 
 
+
+# remove raw data dfs if no longer needed
+rm(list = ls(pattern = "raw"))
+
+# remove the dfs created from processing data for individual spec runs if no longer needed
+rm(list = ls(pattern = "S[123]_"))
+
+
+
