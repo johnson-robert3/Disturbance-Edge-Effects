@@ -287,5 +287,76 @@ ggplot(tmp) +
 ## potential outlier point at 3.0m??
 
 
+#-- Porewater S standardized to sediment variables
+
+tmp = meadow %>%
+   mutate(surf_s_by_om = surface_pwS / perc_om,
+          rhiz_s_by_om = rhizome_pwS / perc_om,
+          surf_s_by_bd = surface_pwS / dbd,
+          rhiz_s_by_bd = rhizome_pwS / dbd)
+
+
+# view Surface S standardized to sed OM along transect distance, all sites individually 
+windows(height=3.5, width=8)
+ggplot(tmp) +
+   #
+   geom_line(aes(x = distance, y = surf_s_by_om, group = interaction(site_id, treatment), linetype = treatment), 
+             linewidth= 0.75, alpha=0.5) +
+   geom_point(aes(x = distance, y = surf_s_by_om), size=3, alpha = 0.5) +
+   geom_vline(aes(xintercept = 0), linetype=2, color="gray50") +
+   #
+   scale_y_continuous(name = expression(Surface~sulfide~by~OM)) +
+   facet_wrap(facets = vars(site_id), nrow=2) +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
+
+
+# view Surface S standardized to sed DBD along transect distance, all sites individually 
+windows(height=3.5, width=8)
+ggplot(tmp) +
+   #
+   geom_line(aes(x = distance, y = surf_s_by_bd, group = interaction(site_id, treatment), linetype = treatment), 
+             linewidth= 0.75, alpha=0.5) +
+   geom_point(aes(x = distance, y = surf_s_by_bd), size=3, alpha = 0.5) +
+   geom_vline(aes(xintercept = 0), linetype=2, color="gray50") +
+   #
+   scale_y_continuous(name = expression(Surface~sulfide~by~DBD)) +
+   facet_wrap(facets = vars(site_id), nrow=2) +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
+
+
+# view Rhizome S standardized to sed OM along transect distance, all sites individually 
+windows(height=3.5, width=8)
+ggplot(tmp) +
+   #
+   geom_line(aes(x = distance, y = rhiz_s_by_om, group = interaction(site_id, treatment), linetype = treatment), 
+             linewidth= 0.75, alpha=0.5) +
+   geom_point(aes(x = distance, y = rhiz_s_by_om), size=3, alpha = 0.5) +
+   geom_vline(aes(xintercept = 0), linetype=2, color="gray50") +
+   #
+   scale_y_continuous(name = expression(Rhizome~sulfide~by~OM)) +
+   facet_wrap(facets = vars(site_id), nrow=2) +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
+
+
+# view Rhizome S standardized to sed OM along transect distance, all sites individually 
+windows(height=3.5, width=8)
+ggplot(tmp) +
+   #
+   geom_line(aes(x = distance, y = rhiz_s_by_bd, group = interaction(site_id, treatment), linetype = treatment), 
+             linewidth= 0.75, alpha=0.5) +
+   geom_point(aes(x = distance, y = rhiz_s_by_bd), size=3, alpha = 0.5) +
+   geom_vline(aes(xintercept = 0), linetype=2, color="gray50") +
+   #
+   scale_y_continuous(name = expression(Rhizome~sulfide~by~DBD)) +
+   facet_wrap(facets = vars(site_id), nrow=2) +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
 
 
