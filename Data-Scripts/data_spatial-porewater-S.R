@@ -64,8 +64,8 @@ calc_vial_S = function(.processed, .raw, .std_curve) {
       filter(!(str_detect(sample_id, pattern="dup"))) %>%
       # sulfide concentration in microcentrifuge vial that diamine reagent was added to (units = uM)
       mutate(vial_S_uM = calc_S_conc(abs_corr, .std_curve)) %>%
-      # for samples that were below detection limit, concentration = 0
-      mutate(vial_S_uM = replace(vial_S_uM, str_detect(.$flag, pattern="D"), 0))
+      # for samples that were below detection limit, replace concentration with half the DL (DL=2uM, so replace with 1) *may need to update this later
+      mutate(vial_S_uM = replace(vial_S_uM, str_detect(.$flag, pattern="D"), 1))
 }
    
 
