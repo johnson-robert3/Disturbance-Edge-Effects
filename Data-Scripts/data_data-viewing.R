@@ -26,6 +26,9 @@ ggplot(meadow) +
    facet_wrap(facets = vars(treatment)) # yes, all treatments need to be log transformed
 
 ggplot(meadow) +
+   geom_point(aes(x = treatment, y = surface_pwS, color = treatment), position="jitter")
+
+ggplot(meadow) +
    geom_histogram(aes(x = log(surface_pwS), fill = treatment)) +
    facet_wrap(facets = vars(treatment)) # data are zero-inflated (especially vegetated) due to instrument detection limit
 
@@ -34,14 +37,6 @@ ggplot(meadow %>%
           arrange(surface_pwS) %>%
           mutate(rank = seq(length(.$surface_pwS)))) +
    geom_point(aes(x = rank, y = surface_pwS, color=treatment))
-
-
-# Surface sulfide vs distance from the veg edge
-ggplot(meadow) +
-   geom_point(aes(x = transect_location_m, y = surface_pwS, color = treatment), position = position_jitter(height=0, width=0.07))
-
-ggplot(meadow) +
-   geom_point(aes(x = transect_location_m, y = log(surface_pwS), color = treatment), position = position_jitter(height=0, width=0.07))
 
 
 
@@ -76,14 +71,6 @@ ggplot(meadow %>%
           arrange(rhizome_pwS) %>%
           mutate(rank = seq(length(.$rhizome_pwS)))) +
    geom_point(aes(x = rank, y = rhizome_pwS, color=treatment))
-
-
-# Rhizome sulfide vs distance from the veg edge
-ggplot(meadow) +
-   geom_point(aes(x = transect_location_m, y = rhizome_pwS, color = treatment), position = position_jitter(height=0, width=0.07))
-
-ggplot(meadow) +
-   geom_point(aes(x = transect_location_m, y = log(rhizome_pwS), color = treatment), position = position_jitter(height=0, width=0.07))
 
 
 
@@ -122,11 +109,6 @@ ggplot(meadow) +
    geom_boxplot(aes(x = treatment, y = dbd))  # potentially 3 outlier points (low) in vegetated treatment
 
 
-# DBD vs distance from the veg edge
-ggplot(meadow) +
-   geom_point(aes(x = transect_location_m, y = dbd, color = treatment), position = position_jitter(height=0, width=0.07)) +
-   geom_smooth(aes(x = transect_location_m, y = dbd, color = treatment), method="lm", se=F)
-
 
 #- Sediment Porosity
 
@@ -142,11 +124,9 @@ ggplot(meadow) + geom_boxplot(aes(y=porosity))  # one potential outlier (high)
 ggplot(meadow) +
    geom_boxplot(aes(x = treatment, y = porosity))  # no outliers when grouped by treatment
 
-
-# Porosity vs distance from the veg edge
+# outliers by site?
 ggplot(meadow) +
-   geom_point(aes(x = transect_location_m, y = porosity, color = treatment), position = position_jitter(height=0, width=0.07)) +
-   geom_smooth(aes(x = transect_location_m, y = porosity, color = treatment), method="lm", se=F)
+   geom_boxplot(aes(x = site_name, y = porosity))  # two potential outliers (high), one at Anne's and one at Craig
 
 
 
@@ -185,15 +165,11 @@ ggplot(meadow) +
    geom_boxplot(aes(x = treatment, y = perc_om))  # potentially outlier points in unveg trt (high and low) and veg trt (high)
 
 
-# OM vs distance from the veg edge
-ggplot(meadow) +
-   geom_point(aes(x = transect_location_m, y = perc_om, color = treatment), position = position_jitter(height=0, width=0.07)) +
-   geom_smooth(aes(x = transect_location_m, y = perc_om, color = treatment), method="lm", se=F)
-
-
 # OM by site and treatment
 ggplot(meadow) +
    geom_boxplot(aes(x = site_name, y = perc_om, group=interaction(site_name, treatment), color = treatment))
+
+
 
 #- Tt density
 
@@ -231,7 +207,6 @@ ggplot(meadow) +
 #- Macroalgal density
 ggplot(meadow) +
    geom_boxplot(aes(x = site_name, y = total_ma_biomass, group=interaction(site_name, treatment), color = treatment))
-
 
 
 
