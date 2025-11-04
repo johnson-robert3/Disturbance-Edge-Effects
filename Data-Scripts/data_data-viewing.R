@@ -8,7 +8,8 @@
 # view data
 hist(meadow$surface_pwS)
 ggplot(meadow) + geom_histogram(aes(surface_pwS)) # surface pw data need to be log transformed
-ggplot(meadow) + geom_histogram(aes(log(surface_pwS+0.001))) # data are zero-inflated due to instrument detection limit
+# ggplot(meadow) + geom_histogram(aes(log(surface_pwS+0.001))) # data are zero-inflated due to instrument detection limit
+ggplot(meadow) + geom_histogram(aes(log(surface_pwS))) # 
 
 # view data by site
 ggplot(meadow) +
@@ -16,7 +17,7 @@ ggplot(meadow) +
    facet_wrap(facets = vars(site_name)) # yes, all sites need to be log transformed
 
 ggplot(meadow) +
-   geom_histogram(aes(x = log(surface_pwS+0.001), fill = site_name)) +
+   geom_histogram(aes(x = log(surface_pwS), fill = site_name)) +
    facet_wrap(facets = vars(site_name)) # data are zero-inflated (especially Craig) due to instrument detection limit
 
 # view data by treatment
@@ -25,7 +26,7 @@ ggplot(meadow) +
    facet_wrap(facets = vars(treatment)) # yes, all treatments need to be log transformed
 
 ggplot(meadow) +
-   geom_histogram(aes(x = log(surface_pwS+0.001), fill = treatment)) +
+   geom_histogram(aes(x = log(surface_pwS), fill = treatment)) +
    facet_wrap(facets = vars(treatment)) # data are zero-inflated (especially vegetated) due to instrument detection limit
 
 # rank plot
@@ -40,7 +41,7 @@ ggplot(meadow) +
    geom_point(aes(x = transect_location_m, y = surface_pwS, color = treatment), position = position_jitter(height=0, width=0.07))
 
 ggplot(meadow) +
-   geom_point(aes(x = transect_location_m, y = log(surface_pwS+0.001), color = treatment), position = position_jitter(height=0, width=0.07))
+   geom_point(aes(x = transect_location_m, y = log(surface_pwS), color = treatment), position = position_jitter(height=0, width=0.07))
 
 
 
@@ -49,7 +50,8 @@ ggplot(meadow) +
 # view data
 hist(meadow$rhizome_pwS)
 ggplot(meadow) + geom_histogram(aes(rhizome_pwS)) # rhizome pw data need to be log transformed
-ggplot(meadow) + geom_histogram(aes(log(rhizome_pwS+0.001))) # data are zero-inflated due to instrument detection limit
+# ggplot(meadow) + geom_histogram(aes(log(rhizome_pwS+0.001))) # data are zero-inflated due to instrument detection limit
+ggplot(meadow) + geom_histogram(aes(log(rhizome_pwS))) # 
 
 # view data by site
 ggplot(meadow) +
@@ -57,7 +59,7 @@ ggplot(meadow) +
    facet_wrap(facets = vars(site_name)) # yes, all sites need to be log transformed
 
 ggplot(meadow) +
-   geom_histogram(aes(x = log(rhizome_pwS+0.001), fill = site_name)) +
+   geom_histogram(aes(x = log(rhizome_pwS), fill = site_name)) +
    facet_wrap(facets = vars(site_name)) # data are zero-inflated due to instrument detection limit
 
 # view data by treatment
@@ -66,7 +68,7 @@ ggplot(meadow) +
    facet_wrap(facets = vars(treatment)) # yes, all treatments need to be log transformed
 
 ggplot(meadow) +
-   geom_histogram(aes(x = log(rhizome_pwS+0.001), fill = treatment)) +
+   geom_histogram(aes(x = log(rhizome_pwS), fill = treatment)) +
    facet_wrap(facets = vars(treatment)) # data are zero-inflated (especially vegetated) due to instrument detection limit
 
 # rank plot
@@ -81,7 +83,7 @@ ggplot(meadow) +
    geom_point(aes(x = transect_location_m, y = rhizome_pwS, color = treatment), position = position_jitter(height=0, width=0.07))
 
 ggplot(meadow) +
-   geom_point(aes(x = transect_location_m, y = log(rhizome_pwS+0.001), color = treatment), position = position_jitter(height=0, width=0.07))
+   geom_point(aes(x = transect_location_m, y = log(rhizome_pwS), color = treatment), position = position_jitter(height=0, width=0.07))
 
 
 
