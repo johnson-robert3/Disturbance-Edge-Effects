@@ -27,14 +27,6 @@ qqnorm(residuals(pws.l1))
 pws.l2 = lm(log(surface_pwS+0.001) ~ site_name, meadow)
 qqnorm(residuals(pws.l2))
 
-# using a Tobit model (to account for zeros in the data due to detection limits)
-AER::tobit(log(surface_pwS+0.001) ~ site_name, left=log(0.001), data=meadow) %>% summary  # no; p = 0.28
-
-pws.t1 = AER::tobit(surface_pwS ~ site_name, left=log(0.001), data=meadow)
-qqnorm(residuals(pws.t1))
-
-pws.t2 = AER::tobit(log(surface_pwS+0.001) ~ site_name, left=log(0.001), data=meadow)
-qqnorm(residuals(pws.t2))
 
 # trying an LME
 pws.m1 = lme(surface_pwS ~ site_name, random = ~1|site_id, data = meadow %>% filter(!(is.na(surface_pwS))))
@@ -137,35 +129,6 @@ pws.l4 = lm(log(surface_pwS+0.001) ~ treatment, meadow)
 qqnorm(residuals(pws.l4))
 
 
-# using a Tobit model (to account for zeros in the data due to detection limits)
-AER::tobit(log(surface_pwS+0.001) ~ treatment, left=log(0.001), data=meadow) %>% summary  # p = 0.059; sulfide lower in vegetated areas
-
-pws.t3 = AER::tobit(surface_pwS ~ treatment, left=log(0.001), data=meadow)
-qqnorm(residuals(pws.t3))
-
-pws.t4 = AER::tobit(log(surface_pwS+0.001) ~ treatment, left=log(0.001), data=meadow)
-qqnorm(residuals(pws.t4))
-
-
-
-# site x treatment?
-AER::tobit(log(surface_pwS+0.001) ~ treatment * site_name, left=log(0.001), data=meadow) %>% summary
-## nothing is significant, remove interaction term
-
-AER::tobit(log(surface_pwS+0.001) ~ treatment + site_name, left=log(0.001), data=meadow) %>% summary  # p = 0.056 for veg. trt; no diff among sites
-## sulfide is likely lower in veg areas (p=0.056)
-## no differences among sites
-
-# posthoc analysis on rhizome PW
-mod.pws = AER::tobit(log(surface_pwS+0.001) ~ treatment + site_name, left=log(0.001), data=meadow)
-
-emmeans(mod.pws, ~ treatment|site_name)
-
-contrast(emmeans(mod.pws, ~ treatment|site_name), 
-         method="pairwise")
-## suggests S is higher in unveg areas (same as model summary above), at p = 0.059
-
-
 # trying an LME
 pws.m3 = lme(surface_pwS ~ treatment + site_name, random = ~1|site_id, meadow %>% filter(!(is.na(surface_pwS))))
 qqnorm(residuals(pws.m3))
@@ -254,35 +217,9 @@ anova(h10, h11, h12)  # h11 is best
 # is rhizome pwS sig. diff. between sites? 
 aov(log(rhizome_pwS+0.001) ~ site_name, meadow) %>% summary  # no; p = 0.7
 
-# using a Tobit model (to account for zeros in the data due to detection limits)
-AER::tobit(log(rhizome_pwS+0.001) ~ site_name, left=log(0.001), data=meadow) %>% summary  # no; p = 0.68
-
-pwr.t1 = AER::tobit(log(rhizome_pwS+0.001) ~ site_name, left=log(0.001), data=meadow)
-qqnorm(residuals(pwr.t1))
 
 # is rhizome pwS diff. between treatments? 
 t.test(log(rhizome_pwS+0.001) ~ treatment, meadow)  # no; p = 0.12
-
-# using a Tobit model (to account for zeros in the data due to detection limits)
-AER::tobit(log(rhizome_pwS+0.001) ~ treatment, left=log(0.001), data=meadow) %>% summary  # no; p = 0.12
-
-# site x treatment?
-AER::tobit(log(rhizome_pwS+0.001) ~ treatment*site_name, left=log(0.001), data=meadow) %>% summary  # p = 0.127
-## rhizome PW within unveg (disturbed) areas is not sig. diff. between sites
-## V and U treatments are sig. diff. at Anne's Beach
-## the effect of treatment is sig. diff. at Little Conch compared to Anne's Beach, and rhizome PW does not differ between V and U
-## the treatment effect at Craig seems to differ from Anne's, but is not significant (p=0.06)
-
-
-# posthoc analysis on rhizome PW
-mod.pwr = AER::tobit(log(rhizome_pwS+0.001) ~ treatment * site_name, left=log(0.001), data=meadow)
-
-emmeans(mod.pwr, ~ treatment|site_name)
-
-contrast(emmeans(mod.pwr, ~ treatment|site_name), 
-         method="pairwise")
-## V-U sig. diff. at Anne's Beach; p = 0.007
-## V-U not different at Craig or Little Conch
 
 
 # hurdle models are best for surface PW, so use that here for rhizomes too
