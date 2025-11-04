@@ -13,18 +13,18 @@ library(ggResidpanel)
 #- Surface porewater S -# 
 
 # is surface pwS sig. diff. between sites? 
-aov(log(surface_pwS+0.001) ~ site_name, meadow) %>% summary  # no; p = 0.29
+aov(log(surface_pwS) ~ site_name, meadow) %>% summary  # no; p = 0.29
 
 pws.a1 = aov(surface_pwS ~ site_name, meadow)
 qqnorm(residuals(pws.a1))
 
-pws.a2 = aov(log(surface_pwS+0.001) ~ site_name, meadow)
+pws.a2 = aov(log(surface_pwS) ~ site_name, meadow)
 qqnorm(residuals(pws.a2))
 
 pws.l1 = lm(surface_pwS ~ site_name, meadow)
 qqnorm(residuals(pws.l1))
 
-pws.l2 = lm(log(surface_pwS+0.001) ~ site_name, meadow)
+pws.l2 = lm(log(surface_pwS) ~ site_name, meadow)
 qqnorm(residuals(pws.l2))
 
 
@@ -32,18 +32,18 @@ qqnorm(residuals(pws.l2))
 pws.m1 = lme(surface_pwS ~ site_name, random = ~1|site_id, data = meadow %>% filter(!(is.na(surface_pwS))))
 qqnorm(residuals(pws.m1))
 
-pws.m2 = lme(log(surface_pwS+0.001) ~ site_name, random = ~1|site_id, data = meadow %>% filter(!(is.na(surface_pwS))))
+pws.m2 = lme(log(surface_pwS) ~ site_name, random = ~1|site_id, data = meadow %>% filter(!(is.na(surface_pwS))))
 qqnorm(residuals(pws.m2))
 
 
 
 # is surface pwS sig. diff. between treatments? 
-t.test(log(surface_pwS+0.001) ~ treatment, meadow)  # no, but close; p = 0.067
+t.test(log(surface_pwS) ~ treatment, meadow)  # no, but close; p = 0.067
 
 pws.l3 = lm(surface_pwS ~ treatment, meadow)
 qqnorm(residuals(pws.l3))
 
-pws.l4 = lm(log(surface_pwS+0.001) ~ treatment, meadow)
+pws.l4 = lm(log(surface_pwS) ~ treatment, meadow)
 qqnorm(residuals(pws.l4))
 
 
@@ -52,7 +52,7 @@ pws.m3 = lme(surface_pwS ~ treatment + site_name, random = ~1|site_id, meadow %>
 qqnorm(residuals(pws.m3))
 resid_panel(pws.m3)
 
-pws.m4 = lme(log(surface_pwS+0.001) ~ treatment + site_name, random = ~1|site_id, meadow %>% filter(!(is.na(surface_pwS))))
+pws.m4 = lme(log(surface_pwS) ~ treatment + site_name, random = ~1|site_id, meadow %>% filter(!(is.na(surface_pwS))))
 qqnorm(residuals(pws.m4))
 resid_panel(pws.m4)
 
@@ -62,11 +62,11 @@ resid_panel(pws.m4)
 #- Rhizome porewater S -# 
 
 # is rhizome pwS sig. diff. between sites? 
-aov(log(rhizome_pwS+0.001) ~ site_name, meadow) %>% summary  # no; p = 0.7
+aov(log(rhizome_pwS) ~ site_name, meadow) %>% summary  # no; p = 0.7
 
 
 # is rhizome pwS diff. between treatments? 
-t.test(log(rhizome_pwS+0.001) ~ treatment, meadow)  # no; p = 0.12
+t.test(log(rhizome_pwS) ~ treatment, meadow)  # no; p = 0.12
 
 
 
