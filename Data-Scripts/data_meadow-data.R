@@ -125,3 +125,7 @@ meadow = seagrass %>%
 
 
 
+# remove raw data dfs if no longer needed
+rm(list = ls(pattern = "raw"))
+
+
