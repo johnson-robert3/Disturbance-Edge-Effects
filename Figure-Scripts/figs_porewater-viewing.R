@@ -116,6 +116,14 @@ ggplot(meadow) +
    geom_point(aes(x = transect_location_m, y = log(surface_pwS), color = treatment), position = position_jitter(height=0, width=0.07)) + 
    geom_smooth(aes(x = transect_location_m, y = log(surface_pwS), color = treatment, group=interaction(treatment, site_name), linetype=site_name), method="lm", se=F)
 
+# viewing sites individually
+ggplot(meadow) +
+   geom_point(aes(x = transect_location_m, y = log(surface_pwS), color = treatment), position = position_jitter(height=0, width=0.07)) + 
+   geom_smooth(aes(x = transect_location_m, y = log(surface_pwS), color = treatment, 
+                   group=interaction(treatment, site_name), linetype=site_name), 
+               method="lm", se=F) +
+   facet_wrap(facet = vars(site_name), nrow=1)
+
 
 
 #-- Rhizome Porewater S viewed along transects --#
@@ -210,11 +218,18 @@ ggplot(meadow) +
    geom_point(aes(x = transect_location_m, y = log(rhizome_pwS), color = treatment), position = position_jitter(height=0, width=0.07)) + 
    geom_smooth(aes(x = transect_location_m, y = log(rhizome_pwS), color = treatment, group=interaction(treatment, site_name), linetype=site_name), method="lm", se=F)
 
+# viewing sites individually
+ggplot(meadow) +
+   geom_point(aes(x = transect_location_m, y = log(rhizome_pwS), color = treatment), position = position_jitter(height=0, width=0.07)) + 
+   geom_smooth(aes(x = transect_location_m, y = log(rhizome_pwS), color = treatment, 
+                   group=interaction(treatment, site_name), linetype=site_name), 
+               method="lm", se=F) +
+   facet_wrap(facet = vars(site_name), nrow=1)
 
 
 
 
-# Surface and Rhizome porewater, all patches and separated by treatment
+#- Surface and Rhizome porewater, all patches and separated by treatment
 windows(height=3.5, width=8)
 ggplot(meadow) +
    # surface - Green
@@ -262,15 +277,17 @@ ggplot(meadow) +
 
 
 
-#-- Porewater S, unveg relative to veg --#
+#-- Porewater S, Bare relative to Seagrass --#
+
+# for viewing differences between Veg and Unveg areas at the individual patch level
 
 # create temporary dataset for difference in sulfide between Veg and Unveg treatments
 tmp = meadow %>%
    arrange(site_id, transect_location_m, desc(treatment)) %>% 
    select(site_id, transect_location_m, treatment, contains("pwS")) %>%
    # calculate the difference between veg and unveg for corresponding distances on the transect for each patch
-   # positive value means sulfide is higher in the seagrass
-   # negative value means suflide is higher in the bare patch
+   #- positive value means sulfide is higher in the seagrass
+   #- negative value means suflide is higher in the bare patch
    summarize(surf_s_diff = surface_pwS[treatment=="vegetated"] - surface_pwS[treatment=="unvegetated"], 
              rhiz_s_diff = rhizome_pwS[treatment=="vegetated"] - rhizome_pwS[treatment=="unvegetated"], 
              .by = c(site_id, transect_location_m))
@@ -279,21 +296,57 @@ tmp = meadow %>%
 # Surface S, view variation in the data across transect distances
 ggplot(tmp) +
    geom_point(aes(x = transect_location_m, y = surf_s_diff), position = position_jitter(height=0, width=0.07))
-## potential outlier point(s) at 3.0m??
+
+# view data at a given distance (change in filter)
+ggplot(tmp %>% filter(transect_location_m==1.0)) + 
+   geom_point(aes(x = site_id, y = surf_s_diff)) +
+   geom_hline(yintercept=0, linetype=3)
+
+# view V-U diff along the transect length, for each site individually
+ggplot(tmp) +
+   geom_point(aes(x = transect_location_m, y = surf_s_diff)) +
+   geom_line(aes(x = transect_location_m, y = surf_s_diff)) +
+   facet_wrap(facet = vars(site_id), scales = 'free_y')
+
+
 
 # Rhizome S, view variation in the data across transect distances
 ggplot(tmp) +
    geom_point(aes(x = transect_location_m, y = rhiz_s_diff), position = position_jitter(height=0, width=0.07))
-## potential outlier point at 3.0m??
+
+# view data at a given distance (change in filter)
+ggplot(tmp %>% filter(transect_location_m==1.0)) + 
+   geom_point(aes(x = site_id, y = rhiz_s_diff)) +
+   geom_hline(yintercept=0, linetype=3)
+
+# view V-U diff along the transect length, for each site individually
+ggplot(tmp) +
+   geom_point(aes(x = transect_location_m, y = rhiz_s_diff)) +
+   geom_line(aes(x = transect_location_m, y = rhiz_s_diff)) +
+   facet_wrap(facet = vars(site_id), scales = 'free_y')
+
+
 
 
 #-- Porewater S standardized to sediment variables
 
 tmp = meadow %>%
-   mutate(surf_s_by_om = surface_pwS / perc_om,
+   mutate(
+      # relative to OM
+      surf_s_by_om = surface_pwS / perc_om,
           rhiz_s_by_om = rhizome_pwS / perc_om,
+      # relative to DBD
           surf_s_by_bd = surface_pwS / dbd,
-          rhiz_s_by_bd = rhizome_pwS / dbd)
+          rhiz_s_by_bd = rhizome_pwS / dbd,
+      # relative to thalassia biomass
+          surf_s_by_agb = if_else(is.na(Tt_biomass), surface_pwS, surface_pwS/Tt_biomass),
+          rhiz_s_by_agb = if_else(is.na(Tt_biomass), rhizome_pwS, rhizome_pwS/Tt_biomass),
+      # relative to rhizome biomass
+          surf_s_by_bgb = if_else(is.na(bg_biomass), surface_pwS, surface_pwS/bg_biomass),
+          rhiz_s_by_bgb = if_else(is.na(bg_biomass), rhizome_pwS, rhizome_pwS/bg_biomass),
+      # relative to thalassia LAI
+          surf_s_by_lai = if_else(lai=='NaN', surface_pwS, surface_pwS/lai),
+          rhiz_s_by_lai = if_else(lai=='NaN', rhizome_pwS, rhizome_pwS/lai))
 
 
 # view Surface S standardized to sed OM along transect distance, all sites individually 
@@ -328,6 +381,23 @@ ggplot(tmp) +
    theme(panel.border = element_rect(color="black", fill=NA))
 
 
+# view Surface S standardized to Tt biomass along transect distance, all sites individually 
+windows(height=3.5, width=8)
+ggplot(tmp) +
+   #
+   geom_line(aes(x = distance, y = surf_s_by_agb, group = interaction(site_id, treatment), linetype = treatment), 
+             linewidth= 0.75, alpha=0.5) +
+   geom_point(aes(x = distance, y = surf_s_by_agb), size=3, alpha = 0.5) +
+   geom_vline(aes(xintercept = 0), linetype=2, color="gray50") +
+   #
+   scale_y_continuous(name = expression(Surface~sulfide~by~Tt~biomass)) +
+   facet_wrap(facets = vars(site_id), nrow=2) +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
+
+
+
 # view Rhizome S standardized to sed OM along transect distance, all sites individually 
 windows(height=3.5, width=8)
 ggplot(tmp) +
@@ -358,5 +428,26 @@ ggplot(tmp) +
    #
    theme_classic() +
    theme(panel.border = element_rect(color="black", fill=NA))
+
+
+# view Rhizome S standardized to Tt LAI along transect distance, all sites individually 
+windows(height=3.5, width=8)
+ggplot(tmp) +
+   #
+   geom_line(aes(x = distance, y = rhiz_s_by_lai, group = interaction(site_id, treatment), linetype = treatment), 
+             linewidth= 0.75, alpha=0.5) +
+   geom_point(aes(x = distance, y = rhiz_s_by_lai), size=3, alpha = 0.5) +
+   geom_vline(aes(xintercept = 0), linetype=2, color="gray50") +
+   #
+   scale_y_continuous(name = expression(Rhizome~sulfide~by~LAI)) +
+   facet_wrap(facets = vars(site_id), nrow=2) +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
+
+
+
+
+
 
 
