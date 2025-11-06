@@ -1,5 +1,7 @@
 #
-# View data and evaluate need for data transformation
+# View data for porewater, seagrass, and sediment variables
+#
+# for viewing spread and variance in the data
 #
 
 
@@ -208,6 +210,10 @@ ggplot(meadow) +
 ggplot(meadow) +
    geom_boxplot(aes(x = site_name, y = total_ma_biomass, group=interaction(site_name, treatment), color = treatment))
 
+
+#- Small burrow density
+ggplot(meadow) +
+   geom_boxplot(aes(x = site_name, y = Burrow_sm_density, group=interaction(site_name, treatment), color = treatment))
 
 
 
