@@ -414,7 +414,7 @@ ggplot(tmp) +
    theme(panel.border = element_rect(color="black", fill=NA))
 
 
-# view Rhizome S standardized to sed OM along transect distance, all sites individually 
+# view Rhizome S standardized to sed DBD along transect distance, all sites individually 
 windows(height=3.5, width=8)
 ggplot(tmp) +
    #
