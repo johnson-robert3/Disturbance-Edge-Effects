@@ -113,6 +113,130 @@ ggplot(meadow) +
 
 
 
+#- Thalassia seagrass parameters viewed along transects -#
+
+# Tt aboveground biomass based on distance from edge, all sites individually
+windows(height=3.5, width=8)
+ggplot(meadow %>%
+          mutate(Tt_biomass = if_else(treatment=="unvegetated" & is.na(Tt_biomass), 0, Tt_biomass))) +
+   #
+   geom_line(aes(x = distance, y = Tt_biomass, group = interaction(site_id, treatment), linetype = treatment), 
+             linewidth= 0.75, alpha=0.5) +
+   geom_point(aes(x = distance, y = Tt_biomass), size=3, alpha = 0.5) +
+   geom_vline(aes(xintercept = 0), linetype=2, color="gray50") +
+   #
+   scale_y_continuous(name = expression(Thalassia~biomass), limits = c(0,300)) +
+   facet_wrap(facets = vars(site_id), nrow=2) +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
+
+
+# Tt Shoot Density based on distance from edge, all sites individually
+windows(height=3.5, width=8)
+ggplot(meadow) +
+   #
+   geom_line(aes(x = distance, y = Tt_density, group = interaction(site_id, treatment), linetype = treatment), 
+             linewidth= 0.75, alpha=0.5) +
+   geom_point(aes(x = distance, y = Tt_density), size=3, alpha = 0.5) +
+   geom_vline(aes(xintercept = 0), linetype=2, color="gray50") +
+   #
+   scale_y_continuous(name = expression(Thalassia~shoot~density)) +
+   facet_wrap(facets = vars(site_id), nrow=2) +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
+
+
+# Tt canopy height (leaf length)
+windows(height=3.5, width=8)
+ggplot(meadow %>%
+          mutate(blade_length = if_else(treatment=="unvegetated" & is.na(blade_length), 0, blade_length))) +
+   #
+   geom_line(aes(x = distance, y = blade_length, group = interaction(site_id, treatment), linetype = treatment), 
+             linewidth= 0.75, alpha=0.5) +
+   geom_point(aes(x = distance, y = blade_length), size=3, alpha = 0.5) +
+   geom_vline(aes(xintercept = 0), linetype=2, color="gray50") +
+   #
+   scale_y_continuous(name = expression(Seagrass~canopy~height~(cm))) +
+   facet_wrap(facets = vars(site_id), nrow=2) +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
+
+
+# Leaf Area Index
+windows(height=3.5, width=8)
+ggplot(meadow %>%
+          mutate(lai = if_else(treatment=="unvegetated" & is.na(lai), 0, lai))) +
+   #
+   geom_line(aes(x = distance, y = lai, group = interaction(site_id, treatment), linetype = treatment), 
+             linewidth= 0.75, alpha=0.5) +
+   geom_point(aes(x = distance, y = lai), size=3, alpha = 0.5) +
+   geom_vline(aes(xintercept = 0), linetype=2, color="gray50") +
+   #
+   scale_y_continuous(name = expression(LAI)) +
+   facet_wrap(facets = vars(site_id), nrow=2) +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
+
+
+
+#- Macroalgae parameters viewed along transects -#
+
+# MA density
+windows(height=3.5, width=8)
+ggplot(meadow) +
+   #
+   geom_line(aes(x = distance, y = total_ma_density, group = interaction(site_id, treatment), linetype = treatment), 
+             linewidth= 0.75, alpha=0.5) +
+   geom_point(aes(x = distance, y = total_ma_density), size=3, alpha = 0.5) +
+   geom_vline(aes(xintercept = 0), linetype=2, color="gray50") +
+   #
+   scale_y_continuous(name = expression(Macroalgal~density)) +
+   facet_wrap(facets = vars(site_id), nrow=2) +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
+
+
+
+# Total MA biomass
+windows(height=3.5, width=8)
+ggplot(meadow) +
+   #
+   geom_line(aes(x = distance, y = total_ma_biomass, group = interaction(site_id, treatment), linetype = treatment), 
+             linewidth= 0.75, alpha=0.5) +
+   geom_point(aes(x = distance, y = total_ma_biomass), size=3, alpha = 0.5) +
+   geom_vline(aes(xintercept = 0), linetype=2, color="gray50") +
+   #
+   scale_y_continuous(name = expression(Macroalgal~biomass)) +
+   facet_wrap(facets = vars(site_id), nrow=2) +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
+
+
+
+#- Burrow density viewed along transects -#
+
+# small burrows
+windows(height=3.5, width=8)
+ggplot(meadow) +
+   #
+   geom_line(aes(x = distance, y = Burrow_sm_density, group = interaction(site_id, treatment), linetype = treatment), 
+             linewidth= 0.75, alpha=0.5) +
+   geom_point(aes(x = distance, y = Burrow_sm_density), size=3, alpha = 0.5) +
+   geom_vline(aes(xintercept = 0), linetype=2, color="gray50") +
+   #
+   scale_y_continuous(name = expression(Small~burrow~density~(no.~m^-2))) +
+   facet_wrap(facets = vars(site_id), nrow=2) +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
+
+
 
 
 
