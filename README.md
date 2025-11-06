@@ -27,5 +27,9 @@ Questions to investigate:
    - [x] OM content
 
 
-- [ ] Is there a difference in S concentration between treatments at the 5m sampling points? (used a paired approach to test at the patch level)
+- [x] Is there a difference in S concentration between treatments at the 5m sampling points? (used a paired approach to test at the patch level)
+   - No
 
+- [ ] Is there a relationship between small burrow density and distance from the seagrass boundary? 
+- [ ] Is there a relationship between burrow density and porewater sulfide? 
+- [ ] Is burrow density related to sediment OM, DBD, or porosity?
