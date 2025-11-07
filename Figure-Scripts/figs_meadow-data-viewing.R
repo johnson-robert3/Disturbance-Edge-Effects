@@ -46,6 +46,17 @@ ggplot(meadow) +
 ##  within bare patches next to the seagrass boundary (and sometimes similar to the OM in the seagrass area near the edge)
 
 
+# OM, all sites pooled, mean + SE by treatment
+windows(height=3, width=5)
+ggplot(meadow %>%
+          summarize(mean = mean(perc_om, na.rm=T), se = se(perc_om), .by = c(treatment, distance))) +
+   geom_errorbar(aes(x = distance, ymin = mean - se, ymax = mean + se), width=0) +
+   geom_point(aes(x = distance, y = mean), size=2) +
+   geom_line(aes(x = distance, y = mean)) +
+   geom_vline(xintercept = 0, linetype=2) +
+   labs(y = "%OM") +
+   theme_classic()
+
 
 
 #- Sediment Bulk Density viewed along transects -#
@@ -79,6 +90,17 @@ ggplot(meadow) +
    geom_smooth(aes(x = transect_location_m, y = dbd, color = treatment, group=interaction(treatment, site_name), linetype=site_name), method="lm", se=F)
 
 
+# DBD, all sites pooled, mean + SE by treatment
+windows(height=3, width=5)
+ggplot(meadow %>%
+          summarize(mean = mean(dbd, na.rm=T), se = se(dbd), .by = c(treatment, distance))) +
+   geom_errorbar(aes(x = distance, ymin = mean - se, ymax = mean + se), width=0) +
+   geom_point(aes(x = distance, y = mean), size=2) +
+   geom_line(aes(x = distance, y = mean)) +
+   geom_vline(xintercept = 0, linetype=2) +
+   labs(y = "Dry bulk density") +
+   theme_classic()
+
 
 
 #- Sediment Porosity viewed along transects -#
@@ -110,6 +132,18 @@ ggplot(meadow) +
 ggplot(meadow) +
    geom_point(aes(x = transect_location_m, y = porosity, color = treatment), position = position_jitter(height=0, width=0.07)) +
    geom_smooth(aes(x = transect_location_m, y = porosity, color = treatment, group=interaction(treatment, site_name), linetype=site_name), method="lm", se=F)
+
+
+# Porosity, all sites pooled, mean + SE by treatment
+windows(height=3, width=5)
+ggplot(meadow %>%
+          summarize(mean = mean(porosity, na.rm=T), se = se(porosity), .by = c(treatment, distance))) +
+   geom_errorbar(aes(x = distance, ymin = mean - se, ymax = mean + se), width=0) +
+   geom_point(aes(x = distance, y = mean), size=2) +
+   geom_line(aes(x = distance, y = mean)) +
+   geom_vline(xintercept = 0, linetype=2) +
+   labs(y = "Porosity") +
+   theme_classic()
 
 
 
@@ -237,6 +271,32 @@ ggplot(meadow) +
    theme(panel.border = element_rect(color="black", fill=NA))
 
 
+# total burrows
+windows(height=3.5, width=8)
+ggplot(meadow) +
+   #
+   geom_line(aes(x = distance, y = burrow_density, group = interaction(site_id, treatment), linetype = treatment), 
+             linewidth= 0.75, alpha=0.5) +
+   geom_point(aes(x = distance, y = burrow_density), size=3, alpha = 0.5) +
+   geom_vline(aes(xintercept = 0), linetype=2, color="gray50") +
+   #
+   scale_y_continuous(name = expression(Burrow~density~(no.~m^-2))) +
+   facet_wrap(facets = vars(site_id), nrow=2) +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
+
+
+# burrow density, all sites pooled, mean + SE by treatment
+windows(height=3, width=5)
+ggplot(meadow %>%
+          summarize(mean = mean(burrow_density, na.rm=T), se = se(burrow_density), .by = c(treatment, distance))) +
+   geom_errorbar(aes(x = distance, ymin = mean - se, ymax = mean + se), width=0) +
+   geom_point(aes(x = distance, y = mean), size=2) +
+   geom_line(aes(x = distance, y = mean)) +
+   geom_vline(xintercept = 0, linetype=2) +
+   labs(y = "Burrow density") +
+   theme_classic()
 
 
 

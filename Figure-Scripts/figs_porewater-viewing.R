@@ -7,6 +7,7 @@ library(tidyverse)
 
 # run 'data_spatial-porewater-S' and 'data_meadow-data' scripts first to generate data
 
+se = function(.x) { sd(.x, na.rm=T) / sqrt(length(.x)) }
 
 # add a new variable for graphing distance along the transect
 meadow = meadow %>%
@@ -125,6 +126,31 @@ ggplot(meadow) +
    facet_wrap(facet = vars(site_name), nrow=1)
 
 
+# surface sulfide, all sites pooled, mean + SE by treatment
+windows(height=3, width=5)
+ggplot(meadow %>%
+          summarize(mean = mean(surface_pwS, na.rm=T), se = se(surface_pwS), .by = c(treatment, distance))) +
+   geom_errorbar(aes(x = distance, ymin = mean - se, ymax = mean + se), width=0) +
+   geom_point(aes(x = distance, y = mean), size=2) +
+   geom_line(aes(x = distance, y = mean)) +
+   geom_vline(xintercept = 0, linetype=2) +
+   labs(y = "Surface sulfide") +
+   theme_classic()
+
+# log
+windows(height=3, width=5)
+ggplot(meadow %>%
+          summarize(mean = mean(log(surface_pwS), na.rm=T), se = se(log(surface_pwS)), .by = c(treatment, distance))) +
+   geom_errorbar(aes(x = distance, ymin = mean - se, ymax = mean + se), width=0) +
+   geom_point(aes(x = distance, y = mean), size=2) +
+   geom_line(aes(x = distance, y = mean)) +
+   geom_vline(xintercept = 0, linetype=2) +
+   labs(y = "log Surface sulfide") +
+   theme_classic() +
+   theme_classic()
+
+
+
 
 #-- Rhizome Porewater S viewed along transects --#
 
@@ -225,6 +251,29 @@ ggplot(meadow) +
                    group=interaction(treatment, site_name), linetype=site_name), 
                method="lm", se=F) +
    facet_wrap(facet = vars(site_name), nrow=1)
+
+
+# rhizome sulfide, all sites pooled, mean + SE by treatment
+windows(height=3, width=5)
+ggplot(meadow %>%
+          summarize(mean = mean(rhizome_pwS, na.rm=T), se = se(rhizome_pwS), .by = c(treatment, distance))) +
+   geom_errorbar(aes(x = distance, ymin = mean - se, ymax = mean + se), width=0) +
+   geom_point(aes(x = distance, y = mean), size=2) +
+   geom_line(aes(x = distance, y = mean)) +
+   geom_vline(xintercept = 0, linetype=2) +
+   labs(y = "Rhizome sulfide") +
+   theme_classic()
+
+# log
+windows(height=3, width=5)
+ggplot(meadow %>%
+          summarize(mean = mean(log(rhizome_pwS), na.rm=T), se = se(log(rhizome_pwS)), .by = c(treatment, distance))) +
+   geom_errorbar(aes(x = distance, ymin = mean - se, ymax = mean + se), width=0) +
+   geom_point(aes(x = distance, y = mean), size=2) +
+   geom_line(aes(x = distance, y = mean)) +
+   geom_vline(xintercept = 0, linetype=2) +
+   labs(y = "log Rhizome sulfide") +
+   theme_classic()
 
 
 
@@ -333,7 +382,7 @@ ggplot(tmp) +
 tmp = meadow %>%
    mutate(
       # relative to OM
-      surf_s_by_om = surface_pwS / perc_om,
+          surf_s_by_om = surface_pwS / perc_om,
           rhiz_s_by_om = rhizome_pwS / perc_om,
       # relative to DBD
           surf_s_by_bd = surface_pwS / dbd,
@@ -346,7 +395,10 @@ tmp = meadow %>%
           rhiz_s_by_bgb = if_else(is.na(bg_biomass), rhizome_pwS, rhizome_pwS/bg_biomass),
       # relative to thalassia LAI
           surf_s_by_lai = if_else(lai=='NaN', surface_pwS, surface_pwS/lai),
-          rhiz_s_by_lai = if_else(lai=='NaN', rhizome_pwS, rhizome_pwS/lai))
+          rhiz_s_by_lai = if_else(lai=='NaN', rhizome_pwS, rhizome_pwS/lai),
+      # relative to burrow density
+         surf_by_burr = surface_pwS / (burrow_density+1),
+         rhiz_by_burr = rhizome_pwS / (burrow_density+1))
 
 
 # view Surface S standardized to sed OM along transect distance, all sites individually 
@@ -446,6 +498,20 @@ ggplot(tmp) +
    theme(panel.border = element_rect(color="black", fill=NA))
 
 
+# view Rhizome S standardized to burrow density along transect distance, all sites individually 
+windows(height=3.5, width=8)
+ggplot(tmp) +
+   #
+   geom_line(aes(x = distance, y = rhiz_by_burr, group = interaction(site_id, treatment), linetype = treatment), 
+             linewidth= 0.75, alpha=0.5) +
+   geom_point(aes(x = distance, y = rhiz_by_burr), size=3, alpha = 0.5) +
+   geom_vline(aes(xintercept = 0), linetype=2, color="gray50") +
+   #
+   scale_y_continuous(name = expression(Rhizome~sulfide~by~burrows)) +
+   facet_wrap(facets = vars(site_id), nrow=2) +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
 
 
 
