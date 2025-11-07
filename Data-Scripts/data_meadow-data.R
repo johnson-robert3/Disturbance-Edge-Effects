@@ -29,7 +29,9 @@ density = raw_meadow_parameters %>%
    mutate(across(ends_with("count"), ~./quadrat_area_m2)) %>%
    rename_with(.cols = ends_with("count"), .fn = ~str_replace(., pattern = "count", replacement = "density")) %>%
    # total macroalgal density
-   mutate(total_ma_density = rowSums(select(., Hal_density, Udo_density, Pen_density, Rhi_density, Cau_density), na.rm=TRUE))
+   mutate(total_ma_density = rowSums(select(., Hal_density, Udo_density, Pen_density, Rhi_density, Cau_density), na.rm=TRUE),
+          # total burrow density (combine large and small burrow counts)
+          burrow_density = Burrow_sm_density + Burrow_lg_density)
 
 # mean blade length and width for each quadrat (morph measured on 5 blades from each quadrat)
 morph = raw_morphometry %>%
