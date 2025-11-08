@@ -132,6 +132,16 @@ meadow %>%
 ## rhizome sulfide is not sig. diff. between V and U near the middle in any patch
 
 
+# is Rhizome sulfide different across the boundary (does it differ between treatments at the 0.5m mark?)
+t.test(rhizome_pwS ~ treatment, alternative="greater",
+       data = meadow %>%
+          filter(transect_location_m==0.5))
+# p = 0.08; there is a trend for higher sulfide at rhizome depth just outside the seagrass boundary (0.5m into bare patches compared to veg)
+
+t.test(log(rhizome_pwS) ~ treatment, alternative="greater",
+       data = meadow %>%
+          filter(transect_location_m==0.5))
+
 
 
 
@@ -190,6 +200,13 @@ broom.mixed::tidy(mod.om.d)
 ## no, effect of distance is nearly sig. (p=0.067), treatment is not sig (p=0.2), interaction is not sig. (p=0.11)
 
 
+
+# Is burrow density sig. diff. between treatments? 
+
+glm(burrow_density ~ treatment + transect_location_m, family = gaussian, data = meadow) %>% summary
+lm(burrow_density ~ treatment + transect_location_m, data = meadow) %>% summary
+
+lm(burrow_density ~ treatment, meadow %>% filter(transect_location_m==0.5)) %>% summary
 
 
 
