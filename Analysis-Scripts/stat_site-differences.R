@@ -5,8 +5,8 @@
 library(car)
 library(nlme)
 library(emmeans)
-library(AER)
-library(glmmTMB)
+# library(AER)
+# library(glmmTMB)
 library(ggResidpanel)
 
 set.seed(123)
@@ -179,6 +179,10 @@ contrast(emmeans(mod.om, ~treatment|site_name),
          method = "pairwise")
 ## OM is sig. greater in Veg areas at Craig and Conch, no diff. between treatments at Anne's
 
+contrast(emmeans(mod.om, ~treatment),
+         method = "pairwise")
+
+
 # gls (no random effect)
 mod.om2 = gls(perc_om ~ site_name * treatment, data = meadow)
 Anova(mod.om2, type=3)
@@ -203,7 +207,38 @@ contrast(emmeans(mod.om1, ~treatment|site_name),
 
 
 
+#- Porosity -# 
 
+# between sites? 
+
+# lme() using random effect for patch
+mod.por = lme(porosity ~ site_name * treatment, random = ~1|site_id, data = meadow)
+summary(mod.por)
+Anova(mod.por, type=3)
+qqnorm(residuals(mod.por))  # possible outlier values at the low end
+
+emmeans(mod.por, ~treatment|site_name)
+contrast(emmeans(mod.por, ~treatment|site_name),
+         method = "pairwise")
+## porosity is sig. greater in Veg patches at all sites
+
+
+
+#- Burrow Density -#
+
+# between sites? 
+
+# lme() using random effect for patch
+mod.bur = lme(burrow_density ~ site_name * treatment, random = ~1|site_id, data = meadow)
+summary(mod.bur)
+Anova(mod.bur, type=3)
+qqnorm(residuals(mod.bur))  # possible outlier values at the low end
+
+emmeans(mod.bur, ~treatment|site_name)
+contrast(emmeans(mod.bur, ~treatment|site_name),
+         method = "pairwise")
+## burrows significantly greater in Unveg areas at Craig and Little Conch
+## burrows also higher in Unveg at Anne's, but diff. isn't sig. (p=0.42)
 
 
 

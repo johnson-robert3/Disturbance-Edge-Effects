@@ -216,6 +216,23 @@ ggplot(meadow %>%
    theme(panel.border = element_rect(color="black", fill=NA))
 
 
+# Rhizome biomass (just at the 0.5 and 5.0m marks)
+windows(height=3.5, width=8)
+ggplot(meadow %>%
+          filter(transect_location_m %in% c(0.5, 5.0))) +
+   #
+   geom_line(aes(x = distance, y = bg_biomass, group = interaction(site_id, treatment), linetype = treatment), 
+             linewidth= 0.75, alpha=0.5) +
+   geom_point(aes(x = distance, y = bg_biomass), size=3, alpha = 0.5) +
+   geom_vline(aes(xintercept = 0), linetype=2, color="gray50") +
+   #
+   scale_y_continuous(name = expression(Rhizome~biomass)) +
+   facet_wrap(facets = vars(site_id), nrow=2) +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
+
+
 
 #- Macroalgae parameters viewed along transects -#
 
@@ -234,6 +251,16 @@ ggplot(meadow) +
    theme_classic() +
    theme(panel.border = element_rect(color="black", fill=NA))
 
+# MA density, all sites pooled, mean + SE by treatment
+windows(height=3, width=5)
+ggplot(meadow %>%
+          summarize(mean = mean(total_ma_density, na.rm=T), se = se(total_ma_density), .by = c(treatment, distance))) +
+   geom_errorbar(aes(x = distance, ymin = mean - se, ymax = mean + se), width=0) +
+   geom_point(aes(x = distance, y = mean), size=2) +
+   geom_line(aes(x = distance, y = mean)) +
+   geom_vline(xintercept = 0, linetype=2) +
+   labs(y = "MA density") +
+   theme_classic()
 
 
 # Total MA biomass
@@ -250,6 +277,17 @@ ggplot(meadow) +
    #
    theme_classic() +
    theme(panel.border = element_rect(color="black", fill=NA))
+
+# MA biomass, all sites pooled, mean + SE by treatment
+windows(height=3, width=5)
+ggplot(meadow %>%
+          summarize(mean = mean(total_ma_biomass, na.rm=T), se = se(total_ma_biomass), .by = c(treatment, distance))) +
+   geom_errorbar(aes(x = distance, ymin = mean - se, ymax = mean + se), width=0) +
+   geom_point(aes(x = distance, y = mean), size=2) +
+   geom_line(aes(x = distance, y = mean)) +
+   geom_vline(xintercept = 0, linetype=2) +
+   labs(y = "MA biomass") +
+   theme_classic()
 
 
 

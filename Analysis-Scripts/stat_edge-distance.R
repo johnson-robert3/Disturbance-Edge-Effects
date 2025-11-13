@@ -200,6 +200,13 @@ broom.mixed::tidy(mod.om.d)
 ## no, effect of distance is nearly sig. (p=0.067), treatment is not sig (p=0.2), interaction is not sig. (p=0.11)
 
 
+# Is sediment OM sig. diff. at the 0.5m mark compared to other distances within unvegetated patches? 
+aov(perc_om ~ transect_location_m,
+    data = meadow %>%
+       filter(treatment=="unvegetated") %>%
+       mutate(transect_location_m = as.factor(transect_location_m))) %>%
+   summary()  # no
+
 
 # Is burrow density sig. diff. between treatments? 
 

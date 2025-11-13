@@ -514,6 +514,38 @@ ggplot(tmp) +
    theme(panel.border = element_rect(color="black", fill=NA))
 
 
+# view Rhizome S standardized to porosity along transect distance, all sites individually 
+windows(height=3.5, width=8)
+ggplot(tmp) +
+   #
+   geom_line(aes(x = distance, y = rhiz_by_por, group = interaction(site_id, treatment), linetype = treatment), 
+             linewidth= 0.75, alpha=0.5) +
+   geom_point(aes(x = distance, y = rhiz_by_por), size=3, alpha = 0.5) +
+   geom_vline(aes(xintercept = 0), linetype=2, color="gray50") +
+   #
+   scale_y_continuous(name = expression(log~Rhizome~sulfide~by~porosity)) +
+   facet_wrap(facets = vars(site_id), nrow=2) +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
+
+
+# view Rhizome S standardized to porosity along transect distance, all sites pooled (mean+SE) 
+windows(height=3.5, width=8)
+ggplot(meadow %>%
+          mutate(tmp = log(rhizome_pwS / porosity)) %>%
+          summarize(mean = mean(tmp, na.rm=T), se = se(tmp), .by = c(treatment, distance))) +
+   #
+   geom_errorbar(aes(x = distance, ymin = mean - se, ymax = mean + se), width=0) +
+   geom_point(aes(x = distance, y = mean), size=2) +
+   geom_line(aes(x = distance, y = mean)) +
+   geom_vline(xintercept = 0, linetype=2) +
+   labs(y = "log Rhizome S by porosity") +
+   #
+   theme_classic() +
+   theme(panel.border = element_rect(color="black", fill=NA))
+
+
 
 
 

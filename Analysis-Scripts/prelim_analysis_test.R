@@ -1,9 +1,24 @@
 
 
 # coefficient of variation (by treatment)
-
+# version used to create values for CERF abstract
 fk_pw_spatial %>% # this is no longer valid, as it doesn't separate surface and rhizome depth porewater samples
    summarize(cv_pw = sd(porewater_S_uM, na.rm=T)/mean(porewater_S_uM, na.rm=T), .by=c(site, treatment)) 
+
+
+# coef of variation by site and treatment
+meadow %>%
+   mutate(logsurf = log(surface_pwS), logrhiz = log(rhizome_pwS)) %>%
+   summarize(across(c(surface_pwS, rhizome_pwS, logsurf, logrhiz), ~ sd(., na.rm=T)/mean(., na.rm=T)), .by=c(site_name, treatment))
+
+
+# coef of variation by patch and treatment
+meadow %>%
+   mutate(logsurf = log(surface_pwS), logrhiz = log(rhizome_pwS)) %>%
+   summarize(across(c(surface_pwS, rhizome_pwS, logsurf, logrhiz), ~ sd(., na.rm=T)/mean(., na.rm=T)), .by=c(site_name, site_id, treatment)) %>%
+   aov(surface_pwS ~ site_name*treatment, data=.) %>% summary
+
+
 
 
 library(nlme)

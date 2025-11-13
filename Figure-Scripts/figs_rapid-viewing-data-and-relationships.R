@@ -206,6 +206,17 @@ ggplot(meadow) +
    theme_classic() +
    theme(panel.border = element_rect(color="black", fill=NA))
 
+   # OM variance vs burrow density
+   windows(height=2.5, width=5)
+   ggplot(meadow %>%
+             summarize(om_var = var(perc_om, na.rm=T), .by=c(burrow_density, treatment))) +
+      geom_point(aes(x = burrow_density, y = om_var, color = treatment), size=3, alpha = 0.5) +
+      # scale_y_continuous(name = expression(Macroalgal~biomass)) +
+      scale_color_manual(values = c("vegetated" = "#41A67E", "unvegetated" = "#05339C")) +
+      # facet_wrap(facets = vars(site_id), nrow=2, scales="free") +
+      theme_classic() +
+      theme(panel.border = element_rect(color="black", fill=NA))
+
 
 # Sediment DBD vs burrow density
 windows(height=2.5, width=5)
