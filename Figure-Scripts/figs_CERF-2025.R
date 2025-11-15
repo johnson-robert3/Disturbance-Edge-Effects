@@ -9,6 +9,8 @@
 
 # run 'data_spatial-porewater-S' and 'data_meadow-data' scripts to create data sets
 
+
+# set new working directory for outputting figures
 setwd("C:/Users/rajohnson6/Box/Projects/Seagrass Disturbance - for Robert")
 
 
@@ -18,10 +20,12 @@ vu_break = c("unvegetated", "vegetated")
 vu_labs = c("Unveg", "Veg")
 
 
+se = function(.x) { sd(.x, na.rm=T) / sqrt(length(.x)) }
+
+
 # add a new variable for graphing distance along the transect
 meadow = meadow %>%
    mutate(distance = if_else(treatment=="unvegetated", transect_location_m * -1, transect_location_m))
-
 
 
 
