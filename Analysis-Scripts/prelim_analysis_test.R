@@ -1,3 +1,8 @@
+#~~ 
+# Do not use this script anymore. 
+# Everything in this script is now incorporated or done differently in other scripts (data_summary-values; stat_site-differences)
+#~~ 
+
 
 
 # coefficient of variation (by treatment)
